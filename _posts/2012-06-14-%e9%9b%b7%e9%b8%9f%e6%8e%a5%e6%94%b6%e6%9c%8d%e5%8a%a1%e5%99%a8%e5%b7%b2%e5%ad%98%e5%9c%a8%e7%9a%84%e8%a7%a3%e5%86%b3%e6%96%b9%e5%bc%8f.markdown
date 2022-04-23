@@ -1,0 +1,36 @@
+---
+layout: post
+status: publish
+published: true
+title: 雷鸟接收服务器已存在的解决方式
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 419
+wordpress_url: http://blog.ch-wind.com/?p=419
+date: '2012-06-14 12:03:07 +0000'
+date_gmt: '2012-06-14 04:03:07 +0000'
+tags:
+- 雷鸟
+- thunderbird
+---
+昨天系统重做之后安装雷鸟准备进行配置，却遇到了一个诡异的问题。
+
+
+向里面添加主gmail账户时不停的报错说“接收服务器已存在”，而添加其他gmail账户却没有这个问题。实在是让人不知道是怎么回事，于是拉出度娘来，依然没有找到答案。话说用雷鸟有那么非主流吗？还是说我遇到的问题比较罕见？
+
+
+最后终于通过google找到了“接收服务器已存在”这个错误在英文版里的原文，实在是感谢mozila连本地化文件都共享出来的精神啊。
+
+
+“接收服务器已存在”的错误原文是incoming server already exists，有了这个关键词终于让我找到解决方式了。
+
+
+不过解决方法简单的让人有点郁闷呢，这个问题只要**重新启动雷鸟**就可以解决了，连重启系统都不用……看来这确实是一个非主流问题呢，一般只要不是像我这样处于偏执状态就不会被这个问题给烦到的吧，望天
+
+

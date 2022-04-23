@@ -1,0 +1,39 @@
+---
+layout: post
+status: publish
+published: true
+title: 创建能在各种浏览器中显示的favicon的方法
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 478
+wordpress_url: http://blog.ch-wind.com/?p=478
+date: '2012-07-22 03:05:55 +0000'
+date_gmt: '2012-07-21 19:05:55 +0000'
+tags:
+- favicon
+- 浏览器
+---
+Favicon的作用相信大家都知道，它可以为网站添加一个个性化的标识，让用户更好的记住网站。
+
+
+favicon的定义也有许多的方法，比如使用rel标签`<link rel="icon" type="image/png" href="/path/image.png">`。favicon的比较传统的作法是将名为favicon.ico的文件传到网站的根目录，这样浏览器就能自动识别。
+
+
+可是在使用ico文件设置favicon的过程中会遇到一个很麻烦的问题，就是各个浏览器的支持并不是相同的。现在通用的有各种各样的浏览器，chrome、firefox、ie、搜狗、360……这些浏览器对favicon的要求是不同的，当然我们也可以认为自己是按照标准做的不用去理会那些浏览器。但是这有时候就像是宣称不支持ie6一样，是件很麻烦的事情。虽然favicon是件小事，可是既然好不容易做出来一个，居然有的访问者看不到心里难免不爽快。
+
+
+其实favicon有的浏览器中favicon没有办法显示是由于.ico本身的问题导致的，一个ico文件中其实可以包含各种分辨率的icon以供使用。但是不同的浏览器要使用的分辨率是不同的，因为每个浏览器的界面设计不同，会将favicon显示在不同的位置。所以要解决这个问题只要我们在ico文件中存入主流的分辨率就可以了。
+
+
+现在如果到google或是baidu里搜索favicon的话可以搜到一大堆提供将图片转化为favicon的网站，只是它们中有的并没有将ico的多个分辨率版本存入文件，有的甚至颜色的压缩算法都比较有问题。于是在经过了一段时间的寻找之后，我终于找到了一个能够做出我希望的favicon的网站了：http://www.convertico.com/。
+
+
+经过测试终于我的favicon可以在搜狗、ie、360、火狐、chrome中都能使用了。所以在这里分享一下。
+
+

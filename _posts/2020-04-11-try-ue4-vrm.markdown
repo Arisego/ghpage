@@ -1,0 +1,71 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4的VRM插件试用
+author:
+ display_name: 风铃
+ login: flinkor
+ email: flinkor@foxmail.com
+ url: ''
+author_login: flinkor
+author_email: flinkor@foxmail.com
+wordpress_id: 2809
+wordpress_url: https://blog.ch-wind.com/?p=2809
+date: '2020-04-11 17:45:49 +0000'
+date_gmt: '2020-04-11 09:45:49 +0000'
+tags:
+- UE4
+- VRM
+---
+最近试用了下UE4的VRM插件。
+
+
+感觉上VRoid这边的社区不是很活跃的样子，最近blender用的VRM插件也因为某些原因[[停止更新](https://github.com/iCyP/VRM_IMPORTER_for_Blender2_8/issues/7#issuecomment-606706478)]了。
+
+
+不过VRoid其实是基于Gltf的，在使用上还是大致不会有很大的问题。
+
+
+插件地址：<https://github.com/ruyo/VRM4U>。由于官方有提供很多效果截图，这边就不贴图了~
+
+
+VRM4U的功能主要包括三个方面：MToon支持、动画辅助和移动开发用的骨骼缩减。
+
+
+主要感兴趣的还是动画风格渲染的MToon的实现，VRM4U这边的目标是使用非侵入式的方式来达到类似于VRoid官方MToon的效果。
+
+
+## 光照
+
+
+作为基础的MToon材质是基于UnLit的，为了防止ToneMap和Exposure的影响，在材质中进行了相应的抵消操作。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2020/04/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2020/04/image.png)
+
+
+对于UnLit的材质，为了模拟阴影效果，使用一个SceneCapture来对周围的阴影进行捕捉，并通过RenderTarget重新应用在了模型上。
+
+
+光照效果方面，则直接使用自定义Shader节点来获取光照的信息并重新赋予到材质上。SkyLight有GetSkySHDiffuseSimple, GetSkySHDiffuse；DirectionalLight则使用DirectionalLightColor并通过光源于发现的关系来决定阴影的构造。
+
+
+天空光源和AO也同样采用了类似的方式进行处理，基础的材质节点非常的复杂，如果之后有需要相关效果的，可以详细的看看具体的实现方式。
+
+
+## 描边
+
+
+描边特效方面，由于要兼容前向渲染，所以VRM没有采用PostProcess的方式。而是使用了模型复制的方式。
+
+
+通过复制一个模型，并将其反转，同时在材质上使用Normal和WorldOffset来进行了某种程度的扩展。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2020/04/image_thumb-1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2020/04/image-1.png)
+
+
+反转的模型与原始模型的同步使用的是SetMasterPoseComponent，保证其能与动画同步。
+
+

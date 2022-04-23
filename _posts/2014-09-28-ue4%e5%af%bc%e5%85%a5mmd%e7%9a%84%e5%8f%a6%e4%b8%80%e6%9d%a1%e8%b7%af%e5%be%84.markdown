@@ -1,0 +1,55 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4导入MMD的另一条路径
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1018
+wordpress_url: http://blog.ch-wind.com/?p=1018
+date: '2014-09-28 20:50:12 +0000'
+date_gmt: '2014-09-28 12:50:12 +0000'
+tags:
+- UE4
+- MMD
+---
+虽然上次最后搞定了MMD导入到UE4的问题，但是中途要使用到的工具实在是太多了。最后经过寻找，终于找到了一条更便捷的导入路径。
+
+
+要使用到的工具只有一个：MMD4Mecanim。工具的官方网站在这里：[http://stereoarts.jp/](http://stereoarts.jp/ "http://stereoarts.jp/")。
+
+
+这个工具包本身是给Unity使用的，但是它在打包过程中的fbx文件可以正常的导入到UE4。
+
+
+这篇文章中的部分内容已经过期，详情请参考[这篇文章](https://blog.ch-wind.com/?p=1250)。
+下载工具并解压之后，其内部的pmx2fbx.exe可以拿来单独使用。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image.png)
+
+
+使用过程相当简单，按照上面的参数说明。第一个参数是pmx文件路径，后面紧跟vmd动作的路径。转换成功后的fbx直接导入到UE4中即可。
+
+
+导入之后可以直接使用，唯一的问题是贴图和材质会出现问题。可以选择在UE中对材质进行重新编辑或者在3dsmax之类的软件中进行修复之后再导入。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image1.png)
+
+
+错误大体上就像上面显示的一样，只是单纯的材质问题。骨骼和动画的使用一切正常。
+
+
+
+> 工具的网盘备份：链接: http://pan.baidu.com/s/1sjsdkPf 密码: vbd1
+> 
+> 
+
+

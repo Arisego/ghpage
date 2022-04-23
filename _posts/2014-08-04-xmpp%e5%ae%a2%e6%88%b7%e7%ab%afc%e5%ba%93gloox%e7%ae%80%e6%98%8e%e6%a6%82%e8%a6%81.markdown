@@ -1,0 +1,219 @@
+---
+layout: post
+status: publish
+published: true
+title: XMPP客户端C++库Gloox简明概要
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 936
+wordpress_url: http://blog.ch-wind.com/?p=936
+date: '2014-08-04 20:00:40 +0000'
+date_gmt: '2014-08-04 12:00:40 +0000'
+tags:
+- c++
+- XMPP
+- Gloox
+---
+Gloox是Xmpp协议客户端的Lib，使用起来非常简单。官方自带的sample也非常的实用，功能方面恰到好处的没有提供显示之类的。对于开发xmpp的bot而言是非常的合适。
+
+
+Xmpp协议虽然不是很流行，但是基于Xmpp的聊天服务还是有很多优点的。使用Xmpp协议来制作bot可以实现很多功能，只要不是网络游戏那样实时大量数据包传递的话，Xmpp是一个很好的避开与网络交互底层接触的解决方案。
+
+
+Xmpp的协议详细的可以参照RFC文档，不过既然选择使用库来做的话就是懒得和协议上的东西打交道。基本功能上就是个聊天软件，想要详细接触的童鞋可以下载Pidgin尝试一下，GTalk是可以使用Xmpp协议连接的。
+
+
+Gloox的设计简单易懂，基于事件驱动。官方有个详细的说明页面，这位前辈的博客上贴出了翻译：http://blog.csdn.net/kkaxiao/article/details/6702298。有兴趣详细了解的童鞋可以去看看。
+
+
+如果只是做简单的开发的话，基本上不会需要很深入的了解。等需要的时候再针对性的找找相关说明即可，gloox的文档里面可以找到大多数的答案。Gloox的使用可以简单的分为两个步骤：登陆账号、处理消息。
+
+
+
+```
+#include "gloox/client.h"
+#include "gloox/messagesessionhandler.h"
+#include "gloox/messageeventhandler.h"
+#include "gloox/messageeventfilter.h"
+#include "gloox/chatstatehandler.h"
+#include "gloox/chatstatefilter.h"
+#include "gloox/connectionlistener.h"
+#include "gloox/disco.h"
+#include "gloox/message.h"
+#include "gloox/gloox.h"
+#include "gloox/lastactivity.h"
+#include "gloox/loghandler.h"
+#include "gloox/logsink.h"
+#include "gloox/connectiontcpclient.h"
+#include "gloox/connectionsocks5proxy.h"
+#include "gloox/connectionhttpproxy.h"
+#include "gloox/messagehandler.h"
+using namespace gloox;
+
+#ifndef _WIN32
+# include <unistd.h>
+#endif
+
+#include <stdio.h>
+#include <string>
+
+#include <cstdio> // [s]print[f]
+
+#if defined( WIN32 ) || defined( _WIN32 )
+# include <windows.h>
+#endif
+
+class MessageTest : public MessageSessionHandler, ConnectionListener, LogHandler,
+	MessageEventHandler, MessageHandler, ChatStateHandler
+{
+public:
+	MessageTest() : m_session( 0 ), m_messageEventFilter( 0 ), m_chatStateFilter( 0 ) {}
+
+	virtual ~MessageTest() {}
+
+	void start()
+	{
+		// <ID和密码 
+		JID jid( "username@gmail.com/gloox" );	// < Id后面的/gloox是资源名称，并不是必须的，Xmpp支持多个客户端同时接入，可以用作区分。
+		j = new Client( jid, "password" );
+		
+		// <注册事件处理
+		j->registerConnectionListener( this );
+		j->registerMessageSessionHandler( this, 0 );
+		j->disco()->setVersion( "messageTest", GLOOX_VERSION, "Win32" );
+		j->disco()->setIdentity( "client", "bot" );
+		j->disco()->addFeature( XMLNS_CHAT_STATES );
+		StringList ca;
+		ca.push_back( "/path/to/cacert.crt" );
+		j->setCACerts( ca );
+		j->logInstance().registerLogHandler( LogLevelDebug, LogAreaAll, this );
+
+
+		if( j->connect( false ) )
+		{
+			ConnectionError ce = ConnNoError;
+			while( ce == ConnNoError )
+			{
+				ce = j->recv();
+			}
+			printf( "ce: %d\n", ce );
+		}
+
+		delete( j );
+	}
+
+	virtual void onConnect()
+	{
+		printf( "connected!!!\n" );
+	}
+
+	virtual void onDisconnect( ConnectionError e )
+	{
+		printf( "message_test: disconnected: %d\n", e );
+		if( e == ConnAuthenticationFailed )
+			printf( "auth failed. reason: %d\n", j->authError() );
+	}
+
+	virtual bool onTLSConnect( const CertInfo& info )
+	{
+		time_t from( info.date_from );
+		time_t to( info.date_to );
+
+		printf( "status: %d\nissuer: %s\npeer: %s\nprotocol: %s\nmac: %s\ncipher: %s\ncompression: %s\n"
+			"from: %s\nto: %s\n",
+			info.status, info.issuer.c_str(), info.server.c_str(),
+			info.protocol.c_str(), info.mac.c_str(), info.cipher.c_str(),
+			info.compression.c_str(), ctime( &from ), ctime( &to ) );
+		return true;
+	}
+
+	virtual void handleMessage( const Message& msg, MessageSession * /*session*/ )
+	{
+		printf( "type: %d, subject: %s, message: %s, thread id: %s\n", msg.subtype(),
+			msg.subject().c_str(), msg.body().c_str(), msg.thread().c_str() );
+
+		std::string re = "You said:\n> " + msg.body() + "\nI like that statement.";
+		std::string sub;
+		if( !msg.subject().empty() )
+			sub = "Re: " +  msg.subject();
+
+		m_messageEventFilter->raiseMessageEvent( MessageEventDisplayed );
+#if defined( WIN32 ) || defined( _WIN32 )
+		Sleep( 1000 );
+#else
+		sleep( 1 );
+#endif
+		m_messageEventFilter->raiseMessageEvent( MessageEventComposing );
+		m_chatStateFilter->setChatState( ChatStateComposing );
+#if defined( WIN32 ) || defined( _WIN32 )
+		Sleep( 2000 );
+#else
+		sleep( 2 );
+#endif
+		m_session->send( re, sub );
+
+		if( msg.body() == "quit" )
+			j->disconnect();
+	}
+
+	virtual void handleMessageEvent( const JID& from, MessageEventType event )
+	{
+		printf( "received event: %d from: %s\n", event, from.full().c_str() );
+	}
+
+	virtual void handleChatState( const JID& from, ChatStateType state )
+	{
+		printf( "received state: %d from: %s\n", state, from.full().c_str() );
+	}
+
+	virtual void handleMessageSession( MessageSession *session )
+	{
+		printf( "got new session\n");
+		// <示例程序只处理一个Session，所以在这里释放掉前一个
+		j->disposeMessageSession( m_session );
+		m_session = session;
+		m_session->registerMessageHandler( this );
+		m_messageEventFilter = new MessageEventFilter( m_session );
+		m_messageEventFilter->registerMessageEventHandler( this );
+		m_chatStateFilter = new ChatStateFilter( m_session );
+		m_chatStateFilter->registerChatStateHandler( this );
+	}
+
+	virtual void handleLog( LogLevel level, LogArea area, const std::string& message )
+	{
+		printf("log: level: %d, area: %d, %s\n", level, area, message.c_str() );
+	}
+
+private:
+	Client *j;
+	MessageSession *m_session;
+	MessageEventFilter *m_messageEventFilter;
+	ChatStateFilter *m_chatStateFilter;
+};
+
+int main( int /*argc*/, char** /*argv*/ )
+{
+	MessageTest *r = new MessageTest();
+	r->start();
+	delete( r );
+	getchar();getchar();
+	return 0;
+}
+
+```
+
+以上代码来自官方的Sample，主要功能是对接到的文字进行复述。在这个基础上进行修改就可以实现常见的需求了。
+
+
+在使用gloox的过程中有一点需要注意的是，MessageSession如果保存了其指针的话，不要自行进行Delete操作，而应该交由Client来释放。j->disposeMessageSession( m_session )这样的做法才是正确的。
+
+
+由于不是做客户端，实际上做的工作还是比较少的。但是刚上手一个库的时候多少会有些不知所措，希望对有用到的童鞋起到帮助。
+
+

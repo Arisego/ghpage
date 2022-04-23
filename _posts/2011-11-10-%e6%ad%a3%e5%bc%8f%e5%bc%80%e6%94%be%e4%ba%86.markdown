@@ -1,0 +1,31 @@
+---
+layout: post
+status: publish
+published: true
+title: 正式开放了
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 153
+wordpress_url: http://www.ch-wind.com/?p=153
+date: '2011-11-10 23:39:56 +0000'
+date_gmt: '2011-11-10 15:39:56 +0000'
+tags: []
+---
+前期一直在内测，不过说是内测其实也就只有我一个人了。
+
+
+虽然没有设访问权限，老实说我可没期待通过谷哥或者度娘过来的这样的低概率事件哦。
+
+
+一直比较矛盾于是否主动去做外链以及把认识的人拉过来什么的，首先对自己的东西不是很有自信。另一方面的话是担心，我总感觉平时自己总是没有把自己的全部都表现出来。我并不是很了解自己，我想别人就更难了解到我了。不过到最后我还是决定做相关的推广活动，由于一开始就不是以盈利为目的的，所以SEO什么的就不会刻意的去做了。虽然这么说，其实我对SEO具体该怎么说也是一点也不了解了。
+
+
+总而言之的话在这里就是这样的自己，希望大家多多关照。
+
+

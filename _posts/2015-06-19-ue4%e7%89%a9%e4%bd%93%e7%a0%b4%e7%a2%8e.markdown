@@ -1,0 +1,285 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4物体破碎
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1301
+wordpress_url: http://blog.ch-wind.com/?p=1301
+date: '2015-06-19 17:11:01 +0000'
+date_gmt: '2015-06-19 09:11:01 +0000'
+tags:
+- UE4
+- 物理
+- 破碎
+---
+UE4的破碎通过可破坏网格物体进行实现，任何一个网格都可以转换为可破坏的网格。
+
+
+当前使用的UE4版本：4.8.0。
+
+
+在实际使用中，要破坏一个物体就必须通过蓝图产生伤害或是在设置中设定碰撞伤害。传递伤害的蓝图节点如下：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/06/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/06/image2.png)
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/06/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/06/image3.png)
+
+
+破坏效果相关的设定几乎都可以在可破坏网格的属性页面进行调整。当前UE4版本中的碰撞面板只能产生深度为1的Voronoi破碎效果，一般情况下就足够使用了。如果需要复杂的破碎效果，例如敲破墙壁等，需要借助[Apex](https://blog.ch-wind.com/?p=1168)来制作后导入引擎。破碎相关的属性中有几个概念比较重要。
+
+
+* 支撑（Support）：一个可破碎的物体在实际的物理世界中是不会一受力就土崩瓦解的，那是因为物体与世界以及物体内部之间有支撑作用。支撑就是用来模拟这个效果的。
+* 碎屑（Debris）：一些过小的碎片对于游戏模拟是没有意义的，可以让他们在一定条件下自行消失。
+* 深度（Depth）：相当与破碎时的层级，当前UE4版本下需要使用Apex来生成。一般物体的部分破坏、复杂的支撑结构都需要借助多深度来实现。
+
+
+可破坏物体的属性面板中影响比较大的是旗标设定，其余大部分属性都是Apex的属性，如果要使用Apex制作的话在这里需要重复设定的内容就比较少。
+
+
+使用到的属性整理如下：
+
+
+*Flags*
+
+
+**Accumulate Damage**
+
+
+累积伤害，当打开时物体会累积所受到的伤害。当累积伤害超过阈值时就会破碎。
+
+
+**Asset Defined Support**
+
+
+当打开时，标记为Is Support Chunk的块将会有支撑效果。
+
+
+**World Support**
+
+
+当打开时，标记为Is Support Chunk的块与世界接触的部分将会获得支撑。
+
+
+**Debris TimeOut**
+
+
+是否启用碎屑超时设定，当启用时碎屑将会在到达生命周期时被删除。
+
+
+**Debris Max Separation**
+
+
+是否启用碎屑消亡距离设定，当启用时碎屑将会在到达消亡距离时被删除。
+
+
+**Crumble Smallest Chunks**
+
+
+当开启时，系统会对最小的碎片进行瓦解。如果有设置对应的粒子系统则会使用粒子的效果，如果没有设置的话则直接清除该碎片。
+
+
+另，目前蓝图中暂时没有找到指定瓦解粒子系统的设置点，灰尘粒子的指定也没有，暂时不会用到就没有做进一步的研究了。
+
+
+**Accurate Raycasts**
+
+
+当开启时，将会使用射线追踪算法对所有与物体发生碰撞的碎片进行搜索。主要用于物体的实际形状和碰撞形态相差比较大的情况下，对破碎点和法线方向进行精确度修正。
+
+
+**Use Valid Bounds**
+
+
+是否启用碎片的有效范围，当碎片超出这个范围时，将会被删除。
+
+
+**Form Extended Structures**
+
+
+对于多个静态的可破坏物体，如果同时都有设置这个旗标的话。将会互相产生支撑作用。
+
+
+ 
+
+
+*Damage*
+
+
+**Damage Threshold**
+
+
+伤害阈值，当受到的伤害大于这个数值时，物体将会破碎。
+
+
+**Damage Spread**
+
+
+伤害扩散指数，指定伤害在物体上传递的速度。在应用范围伤害时产生作用，距离伤害产生点为0的将受到所有的伤害，而到达Damage Radio的距离为止，伤害逐渐衰减为0。
+
+
+**Enable Impact Damage**
+
+
+开启碰撞伤害，开启之后在与其他物体发生碰撞时将会接收伤害。
+
+
+**Impact Damage**
+
+
+碰撞时接收伤害的指数。碰撞所受伤害为这个指数和冲击力的乘积。
+
+
+**Default Impact Damage Depth**
+
+
+碰撞伤害产生的破坏深度。在多碰撞深度，有支撑设定的物体进行破坏时很有作用。。
+
+
+**Custom Impact Resistance**
+
+
+自定义冲击阻力开关
+
+
+**Impact Resistance**
+
+
+自定义冲击阻力。数值越低时碰撞的物体将受到更少的冲击主力，能更轻易的穿过物体。
+
+
+**Damage Cap**
+
+
+伤害上限，规定破碎时所承受的最大伤害。大多用于防止冲击破碎被打开时产生的过于巨大的伤害导致破碎效果大于预期。
+
+
+**Impact Velocity Threshold**
+
+
+在物体重叠生成时，物理引擎会检测到物体之间巨大的碰撞力。但是实际上两个物体之间的相对速度是很低的，通过设定这个阈值，来屏蔽小于这个值时的碰撞伤害的发生。
+
+
+**Max Chunk Speed**
+
+
+当这个值大于0时，碎片的运行速度将会依次为上限。
+
+
+**Fracture Impulse Scale**
+
+
+定义物品破碎时碎片在法线方向的受力比例，这个力将会把碎片推离物体。
+
+
+ 
+
+
+*Hierarchy Depth*
+
+
+**Support Depth**
+
+
+支撑深度，高于这个深度的碎片将会拥有非常精细的支撑效果，而低于这个深度的碎片将不会拥有支撑效果。这个设定将会增进运算的复杂度。
+
+
+**Minimum Fracture Depth**
+
+
+低于这个深度的碎片将不会被破坏，这样能实现更好的支撑效果。当这个值大于最大破碎深度时，物体将不会破碎
+
+
+**Enable Debis**
+
+
+开启碎屑，一些破碎深度很深，也就是很碎的碎片将被视为碎屑。
+
+
+**Debirs Depth**
+
+
+碎片被认定为碎屑深度。
+
+
+**Essential LOD Depth**
+
+
+只有高于这个深度的碎片才会被视为“重要”的，默认为0表示破碎深度0，即破碎前的物体。
+
+
+**Depth Parameters**
+
+
+一个存储EImpactDamageOverride类型的数组，数组序列对应破碎深度。可以用于对碰撞破碎的伤害传递进行重载。
+
+
+ 
+
+
+*Debris*
+
+
+**Debris Lifetime Min**
+
+
+碎屑最短生命周期。当碎屑到达生命周期时将会被系统删除。
+
+
+**Debris Lifetime Max**
+
+
+碎屑最长生命周期
+
+
+**Debris Max Separation Min**
+
+
+碎屑消亡距离最小值。当碎屑到达消亡距离时将会被系统删除。
+
+
+**Debris Max Separation Max**
+
+
+碎屑消亡距离最大值
+
+
+每一个单独的碎屑的生命周期和消亡距离都在对应的最小值和最大值之间。
+
+
+**ValidBounds[min,max]**
+
+
+规定一个范围，当碎屑离开这个范围时将会被删除。
+
+
+ 
+
+
+*Effects*
+
+
+**Fracture Effects[]**
+
+
+特效设置，每一个元素的Index都对应相应的破碎深度。可以设置粒子以及声音效果。
+
+
+ 
+
+
+-----------------------------------------------------------------------
+
+
+物体破碎的逻辑相对简单，和游戏逻辑进行结合也很方便。如果和粒子系统结合的话，应该会有更好的效果。
+
+

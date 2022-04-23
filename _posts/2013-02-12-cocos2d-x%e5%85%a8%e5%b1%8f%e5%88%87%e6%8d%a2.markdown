@@ -1,0 +1,93 @@
+---
+layout: post
+status: publish
+published: true
+title: cocos2d-x全屏切换
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 556
+wordpress_url: http://blog.ch-wind.com/?p=556
+date: '2013-02-12 16:15:00 +0000'
+date_gmt: '2013-02-12 08:15:00 +0000'
+tags:
+- cocos2d-x
+- 全屏
+---
+前段时间研究了下cocos2d-x的全屏功能，虽然勉强算是实现了，但是却没有办法进行全屏的切换。
+
+
+一直都是参照着nehe的opengl教程学习gl的，切换全屏这个功能描述起来也不复杂，就是给rc换成切换之后的dc就可以了。但是其中牵涉到句柄啊什么的各种windows api的东西，这些东西只在操作系统中接触过，而且只是原理层，实在是看到就头大。而且cocos的音频引擎似乎也和hwnd相关，实际改动起来各种bug，完全摸不着头脑。
+
+
+昨天把引擎的音频换成openal了，cocos貌似因为al是lgpl的协议没有支持这个好东西？不过这不是重点。这样一来切换全屏就只剩下wgl上的问题了。但是原来的思路依然是行不通呢，生成新的dc的过程中哪些资源应该被销毁，哪些资源应该保留完全靠自己试。虽然rc中的东西肯定是不用动了，但是dc相关的各个变量也足以让人dt。于是在试了一阵之后终于还是放弃在网上找了一个新的思路。
+
+
+之所以要切换dc是为了销毁原来的窗口，生成全屏窗口，然后再把rc付上去。但其实windows还是提供了别的方法来做这些事情的。过程姑且不计，能看到效果就行。代码如下，需要切换的时候直接调用即可。
+
+
+
+```
+bool CCEGLView::modifyscreenmode(){
+	static BOOL iswindow= !m_bFullScreen;
+	long style;
+	style=GetWindowLong(m_hWnd,GWL_STYLE);
+	if(iswindow=!iswindow)
+	{
+		ChangeDisplaySettings(NULL,0);					// If So Switch Back To The Desktop
+		style |= WS_OVERLAPPEDWINDOW;
+		style &= ~(WS_SIZEBOX|WS_MAXIMIZEBOX);
+		SetWindowLong(m_hWnd,GWL_STYLE,style );
+		SetWindowPos(m_hWnd,
+			HWND_NOTOPMOST,0,0,
+			m_width,
+			m_heigth,
+			SWP_SHOWWINDOW);
+		setFrameSize(m_width,m_heigth);
+	}
+	else
+	{
+		DEVMODE dmScreenSettings;	 // Device Mode
+		memset(&dmScreenSettings,0,sizeof(dmScreenSettings));	// Makes Sure Memory's Cleared
+		dmScreenSettings.dmSize=sizeof(dmScreenSettings);	 // Size Of The Devmode Structure
+		dmScreenSettings.dmPelsWidth	= m_width;	 // Selected Screen Width
+		dmScreenSettings.dmPelsHeight	= m_heigth;	 // Selected Screen Height
+		dmScreenSettings.dmBitsPerPel	= 32;	 // Selected Bits Per Pixel
+		dmScreenSettings.dmFields=DM_BITSPERPEL|DM_PELSWIDTH|DM_PELSHEIGHT;
+
+		// Try To Set Selected Mode And Get Results.  NOTE: CDS_FULLSCREEN Gets Rid Of Start Bar.
+		if (ChangeDisplaySettings(&dmScreenSettings,CDS_FULLSCREEN)!=DISP_CHANGE_SUCCESSFUL)
+		{
+			// If The Mode Fails, Offer Two Options.  Quit Or Use Windowed Mode.
+			if (MessageBox(NULL,L"全屏模式在当前显卡上设置失败\n使用窗口模式？",L"提示",MB_YESNO|MB_ICONEXCLAMATION)==IDYES)
+			{
+				iswindow=true;	 // Windowed Mode Selected.  Fullscreen = FALSE
+			}
+			else
+			{
+				// Pop Up A Message Box Letting User Know The Program Is Closing.
+				MessageBox(NULL,L"程序将会关闭.",L"错误",MB_OK|MB_ICONSTOP);
+				return FALSE;	 // Return FALSE
+			}
+		}
+
+		SetWindowLong(m_hWnd,GWL_STYLE,style&(~WS_OVERLAPPEDWINDOW));
+		SetWindowPos(m_hWnd,
+			HWND_TOPMOST,0,0,
+			GetSystemMetrics(SM_CXSCREEN),
+			GetSystemMetrics(SM_CYSCREEN),
+			SWP_SHOWWINDOW);
+
+	}
+
+}
+```
+
+这样的话也不用原来那些繁琐的重建窗口了，就避免了很多麻烦。
+
+

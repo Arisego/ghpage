@@ -1,0 +1,69 @@
+---
+layout: post
+status: publish
+published: true
+title: UMG在4.6.0版本中的升级变动
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1079
+wordpress_url: http://blog.ch-wind.com/?p=1079
+date: '2014-11-30 13:08:11 +0000'
+date_gmt: '2014-11-30 05:08:11 +0000'
+tags:
+- UE4
+- UMG
+---
+UE4目前处在一个非常活跃的开发阶段，在升级到4.6.0版本之后。UMG功能已经离开了实验性功能模块，同时这个版本已经支持中文语言了。
+
+
+才过了1个多月就有这么大的变动，就只能从断掉的地方从新开始了。好在UMG本身从上一次到现在这个版本并没有什么大的变动。对原有的代码进行检查，目前能找到的变动有下面这些。
+
+
+1. 按钮的绑定函数改为了事件绑定
+
+
+原有的绑定函数的形式不再有效，所以要在蓝图中作出相应的修改。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/11/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/11/image.png)
+
+
+修改为了事件模式之后，按钮和响应函数之间的关系变得更加直观了。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/11/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/11/image1.png)
+
+
+2. Border的颜色属性变动
+
+
+Border现在默认是白色不透明了，如果原来有使用Border进行布局的话升级之后就会看到界面一片白了。要使用透明效果就必须对颜色修改：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/11/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/11/image2.png)
+
+
+3. Add to Viewport 函数变更
+
+
+AddtoViewPort函数中原本的Modal和Show Cursor参数已经没有了。要实现这两个功能，就必须通过PlayerController进行控制。模态的控制如下：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/11/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/11/image3.png)
+
+
+模态相关的话是一个Game和UI的控制权分配问题，通过下面的这组函数进行控制：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/11/image_thumb4.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/11/image4.png)
+
+
+对上面的改动进行相应的修正之后，原本的代码就可以在新的版本中正常的工作 了。
+
+

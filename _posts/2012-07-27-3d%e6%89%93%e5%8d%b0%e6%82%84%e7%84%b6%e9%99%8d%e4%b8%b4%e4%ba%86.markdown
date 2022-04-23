@@ -1,0 +1,49 @@
+---
+layout: post
+status: publish
+published: true
+title: 3D打印悄然降临了
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 483
+wordpress_url: http://blog.ch-wind.com/?p=483
+date: '2012-07-27 18:40:06 +0000'
+date_gmt: '2012-07-27 10:40:06 +0000'
+tags: []
+---
+3d打印技术其实并不能算是什么新的概念，据说早在几十年前就有人提出了，前两年也被抄的特别热(?)。
+
+
+甚至有人将其与tp技术一同列为足以改变21世纪的几项技术之一。不过那个时候看起来整个东西就像是个概念模型一样，给人很不靠谱的感觉。不过，看来我是小看了商业运作的力量了。
+
+
+今天感觉没有什么干劲，于是在网上乱逛，居然又看到了3d打印的文章，于是顺便拖进google搜索了一下，没想到看到了这样的网站：
+
+
+[![](https://blog.ch-wind.com/wp-content/uploads/2012/07/d-300x153.jpg "3d打印服务")](https://blog.ch-wind.com/wp-content/uploads/2012/07/d.jpg)
+
+
+惊讶之余跑到taobao，发现3d打印这个关键词下已经有人在卖设备也有人在提供打印服务了。
+
+
+顺便找到一篇zol的文章，今年5月的，说是第二代3d打印机什么的，重点是价格变得更加便宜了，只是看起来打印的体积上还是受到了技术上的限制。
+
+
+只是技术上应该不存在任何问题，3d打印技术和tp最大的不同是，它不存在什么理论证明上的难度。加上有利可图，相信在几年之内又会有新的突破出现的吧。
+
+
+这样在不久的将来，很多设计上的工作就真的会转移到设计师的手上了，而业余的力量也将变得更加强大。这或许真的是产业上的变革呢，尤其是手办什么的……
+
+
+想想，我是不是应该赶紧学学3d建模什么的呢？
+
+
+以后说不定就成为3d蓝图设计师了呢 = =
+
+

@@ -1,0 +1,96 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4官方UI库UMG简单菜单搭建
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1043
+wordpress_url: http://blog.ch-wind.com/?p=1043
+date: '2014-09-28 20:55:58 +0000'
+date_gmt: '2014-09-28 12:55:58 +0000'
+tags:
+- UE4
+- UMG
+---
+UMG在当前UE4版本中仍然是实验功能，不过已经能基本满足日常UI的制作需求了。于是参考官方教程对UMG的UI的制作进行了熟悉。
+
+
+首先要做的是在引擎中打开UMG功能：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image2.png)
+
+
+打开之后就能在新建菜单中看到UMG相关的项目了，如果看不到的话重启一下引擎就可以了
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image3.png)
+
+
+选择Wdiget  BluePrint就可以新建一个UMG的UI了。
+
+
+在这里我们先新建一个Slate Blush以作背景用
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb4.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image4.png)
+
+
+Slate Brush内部很单纯，选择一张已经导入的图片即可。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb5.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image5.png)
+
+
+创建完Brush之后到刚刚新建的Wdiget里面，删掉默认添加的元件。按照下面的元件顺序添加即可
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb6.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image6.png)
+
+
+背景图片的配置在Border的属性中
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb7.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image7.png)
+
+
+基本上使用起来和普通的UI编辑器没什么大的区别，也就是拖拖调调就可以了。事件的绑定在右边的属性栏里面都能够找到。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb8.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image8.png)
+
+
+新建的事件处理函数名称是可以修改的。给Quit按钮绑定退出功能：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb9.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image9.png)
+
+
+这样的话UMG菜单部分就完成了。接下来只要找一个合适的时机将菜单弹出即可，可以选择在level blueprint的beginplay弹出。这里选择在Hud里面弹出：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb10.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image10.png)
+
+
+这里面有两个需要注意的地方。选中modal可以防止菜单后面的3d界面得到控制权，就是普通ui中的模态。show cursor可以让UI界面中显示鼠标指针，而不用到controller里面去关闭全局的鼠标隐藏。
+
+
+完成之后的界面如下，为了直观将背景图片去掉了：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/09/image_thumb11.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/09/image11.png)
+
+
+以上就是全部的步骤了，最后吐槽下UE的暂停游戏功能。在当前版本下，不使用C++进行处理的情况下，暂停游戏的那行文字提示是去不掉的。不过使用模态来处理的话，基本的应用情境中是不需要暂停游戏的。但是暂停菜单的话……
+
+
+总体而言UMG的功能很容易上手，没有想象中的那么复杂。
+
+

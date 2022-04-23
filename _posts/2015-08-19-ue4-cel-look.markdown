@@ -1,0 +1,110 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4赛璐珞风格
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1495
+wordpress_url: http://blog.ch-wind.com/?p=1495
+date: '2015-08-19 09:03:52 +0000'
+date_gmt: '2015-08-19 01:03:52 +0000'
+tags:
+- UE4
+- Materia
+---
+UE4默认的渲染风格是写实的，以照片级为目标。而如果要做赛璐珞风格的话，就需要稍微做一些改动。
+
+
+当前UE4版本4.10.0。
+
+
+3D的赛璐珞风格实现是有一些现成的经验的，最近有些番组也是用的3D做的。不过作为对图形学方面的知识是外行的人而言，要自己实现还是有很多困难的。好在，已经有人将赛璐珞风格在UE4中实现了。原文的话在[[这里](https://forums.unrealengine.com/showthread.php?88581-%E3%82%A2%E3%83%B3%E3%83%AA%E3%82%A2%E3%83%AB%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B34%E3%81%A7%E3%83%8E%E3%83%B3%E3%83%95%E3%82%A9%E3%83%88%E3%83%AA%E3%82%A2%E3%83%AB%E6%8F%8F%E7%94%BB%E3%81%97%E3%82%88%E3%81%86%EF%BC%81)]，还有对应的PPT，里面有对相应的原理的说明。PPT的下载地址在原文中有提供，点击[[这里](https://www.slideshare.net/EpicGamesJapan/4-unreal-fest-2015-yokohama-54129845)]可以直达。
+
+
+## 最终效果
+
+
+对参数进行少许的调整之后，最终的效果是这样的：
+
+
+[![](https://blog.ch-wind.com/wp-content/uploads/2017/03/phpiU9u6l.1453546682-1.png)](https://blog.ch-wind.com/ue4-cel-look/phpiu9u6l-1453546682-2/)
+
+
+在没有做精细调整的情况下，这样的效果基本上算是让人满意了。使用上也非常的方便，如果有在项目中使用的话，一定要记得在原文中感谢作者哦~下面对在使用过程中可能会使用到的一些东西进行总结，其中几乎所有内容都是直接翻译的，如有错误欢迎指正。
+
+
+## 使用步骤
+
+
+1. 由PP_NPR生成新的材质实例（也可以使用生成的PPI_NPR），将PostProcessVolume的Blendables中添加刚刚生成的材质实例即可
+2. 控制渲染效果的参数位于NPR_ParamCollection中
+3. 控制皮肤的亮度（在SkeletalMesh编辑器中将头发等的投影关闭）
+4. 从M_CharacterBase创建材质实例并应用于角色
+5. 将DirectionalLight替换为BP_DirectionalLightForCharacter(与上面的材质合同工作)
+
+
+## 参数相关
+
+
+
+
+| 名称 | 默认值 | 说明 |
+| --- | --- | --- |
+| DebugWipe | 0 | 屏幕分割，对效果进行调试对比用 |
+| LightIntensityBias | 0.3 | 场景较为暗时可以对暗的部分进行 |
+| LightIntensityStepping | 2 | Cel涂色步进，小于1会出现不可预知的表现 |
+| FresnelFunc_ContrastDark | 0.1 | 用于侧面判定的Fresel的暗面控制参数 |
+| FresnelFunc_ContrastBright | 1.5 | 用于侧面判定的Fresel的亮面控制参数 |
+| EdgeLineThickness | 1.5 | 轮廓线的粗细 |
+| CreaseLineThickness | 1.5 | 棱线的粗细（有时设定为负值，在法线方向上取样时会有好的效果） |
+| FlankLine | 0.2 | 侧面线颜色叠加系数（0为全黑，0.5为原本的颜色的0.5） |
+| EdgeLine | 0.2 | 轮廓线颜色叠加系数（0为全黑，0.5为原本的颜色的0.5） |
+| CreaseLine | 0.2 | 棱线颜色叠加系数（0为全黑，0.5为原本的颜色的0.5） |
+| LineColor | (0.8, 0.084908, 0.045, 0) | 以上三种线的颜色，Alpha值代表叠加颜色的程度，可以超限以达到发光效果 |
+| CharacterLightVector | (0, 0, -1, 0) | 角色表情等会用到的光照向量（建议直接复制DirectionalLight的向量） |
+| CharacterLightColor | (1, 1, 1, 0) | （当前未使用：角色用光照颜色） |
+
+
+## M_CharacterBase相关
+
+
+一般情况下只要利用Postprocess Materia就可以达到效果了，当角色由于阴影的影响过强导致着色浑浊现象出现时，建议使用M_CharaterBase作为对象材质的基础生成材质实例，并在该材质实例中进行属性的调整。
+
+
+如果材质的贴图中本来就有阴影等信息的话，可以在材质实例宏将DiffuseBase调整为0.01使得BaseColor接近于0，将DiffuseEmissive设定为1.0以将阴影效果降到最低。
+
+
+对于追求与现实系相近的中间型的着色效果的情况，可以将材质实例中的Shading Mode更改为Subsurface，这样以来就可以通过对SubsurfaceColor的调整来对颜色效果进行微调。
+
+
+在有发光部件的情况下，勾选UseEmissiveTexture，并将发光部件的贴图彷如EmissiveTexture中，同时设定EmmissiveScale为很大的值就可以达到发光的效果了。
+
+
+## FAQ
+
+
+### Q. 想要关闭掉角色的反光效果
+
+
+A. 在PostProcess的内部，可以某种程度的削弱反光效果，但是想要完全取消掉的话很困难，因为会增加额外的运算负担。对原有的材质的Roughness进行上调以及下调Metalic的值可以达到类似与消除反光的效果。这样的话就可以对模型的效果进行个别控制，一些闪闪发光的材质也能保留原来的效果。
+
+
+### Q. 将漫反射的贴图变得平滑不是更能实现动画风格吗？
+
+
+A. 虽然对相近的像素进行采样并平均的话能够达到平滑的效果，但是以贴图为采样目标的话运算负担就会过重，推荐直接对原有的材质进行修改。这样也可以实现对不同材质的控制和调整。
+
+
+### Q. 角色激烈运动时会导致线条杂乱
+
+
+A. 这是Temporal AA的影响导致的。在PostProcessVolume-Settings-Misc中有AA Method的属性，将其设定为FXAA可以有效的防止这种情况（静画的情况下Temporal AA的画面质量更好一些）。另外，如果是面向在线游戏的画质的话，通过将Screen Percentage设定为200与Temporar AA进行组合，或者将AA关闭（设定为FXAA亦可）以2×2倍的分辨率渲染等方法将渲染目标缩小的方法也是可以的。
+
+

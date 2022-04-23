@@ -1,0 +1,85 @@
+---
+layout: post
+status: publish
+published: true
+title: 自主修改微博秀的方法
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 955
+wordpress_url: http://blog.ch-wind.com/?p=955
+date: '2014-08-19 09:23:00 +0000'
+date_gmt: '2014-08-19 01:23:00 +0000'
+tags:
+- 微博秀
+- 网站
+---
+自从WP-Micro插件停止更新后，一直没有找到可用的替换品。但是随着时间的推移，WP-Micro能支持的微博越来越少，到最后只能自己动手丰衣足食了。
+
+
+通过微博的API来重新做的方案基本可以不用考虑，因为没有那么多的时间花费在这上面。于是决定采用新浪官方的微博秀作为替代品，但是微博秀有个问题，就是他的定制性非常的弱。直接嵌入的话会导致和主题的风格严重冲突，于是，本着我的地盘我做主的原则。我们通过PHP做中继来解决这个问题。
+
+
+需要注意的是，直接使用JS来处理是不可行的。由于浏览器的安全策略，即便使用了黑科技搞定了跨域问题，内容在不同浏览器上的表现将变得不可预知。
+
+
+首先上PHP代码，嫌麻烦的童鞋直接把下面的代码中url的部分替换成自己的微博秀就可以了。代码中有注释，相对还是比较单纯的代码。自定义CSS部分大家可以根据需要自己调整。
+
+
+
+```
+<?php
+ // 获取微博秀
+ $url = 'http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=750&fansRow=2&ptype=1&speed=0&skin=1&isTitle=0&noborder=0&isWeibo=1&isFans=0&uid=2306189460&verifier=a1b73969&dpc=1';
+ $lines_array = file($url);
+ $lines_string = implode('', $lines_array);
+
+ // 输出自定义CSS
+ echo "
+ <style type='text/css'>
+ <!--
+ .weiboShow_developer{
+ display: none !important;
+ }
+ .weiboShow .weiboShow_main_height, .weiboShow .weiboShow_main_allList_focus, .weiboShow .weiboShow_follow {
+ background: transparent !important;
+ }
+ .weiboShow .weiboShow_wrap {
+ border:0 !important;
+ }
+ .weiboShow_main_feed{
+ border:0 !important;
+ }
+ .weiboShow_topborder{
+ display: none !important;
+ }
+ -->
+ </style>";
+ 
+ // 输出微博秀
+ echo $lines_string;
+?>
+
+```
+
+将上面的php代码放到网站的可访问路径上之后，在小工具中新建一个”文本“小工具，在里面插入以下Html代码。其中src部分是刚刚添加的php代码的路径。
+
+
+
+```
+<iframe width="100%" height="750" class="share_self"  frameborder="0" scrolling="no" src="https://blog.ch-wind.com/get_wb.php" frameborder="0" scrolling="auto"  border="0">
+载入中...
+</iframe>
+```
+
+以上这些步骤就可以了。
+
+
+关于扩展功能部分，如果网站的流量很大，可以考虑做一下缓存工作。虽然做成wp的插件比较合适，但是对wp的插件机制没有怎么研究，也没那么多时间去搞。总之能用就行了。
+
+

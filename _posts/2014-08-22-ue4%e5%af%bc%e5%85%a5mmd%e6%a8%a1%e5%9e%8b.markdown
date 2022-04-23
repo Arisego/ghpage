@@ -1,0 +1,196 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4导入MMD模型
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1002
+wordpress_url: http://blog.ch-wind.com/?p=1002
+date: '2014-08-22 10:12:24 +0000'
+date_gmt: '2014-08-22 02:12:24 +0000'
+tags:
+- UE4
+- MMD
+---
+折腾了好几天，终于把MMD模型导入UE4给搞定了。于是总结下经验，顺便把从贴吧淘到的夏娜模型导入到UE4。
+
+
+这篇文章中的部分内容已经过期，详情请参考[[这篇文章]](https://blog.ch-wind.com/?p=1250)。
+事先声明，本人对3D建模这块一窍不通。如果术语方面有出入，请见谅。下面正式开始：
+
+
+首先在Blender这边需要做一点准备工作。
+
+
+到Blender的插件目录<[Blender]\2.71\scripts\addons>中找到FBX导出插件[io_scene_fbx]，用编辑器打开export_fbx.py文件。到第2425行，对两行代码进行注释，如果使用的编辑器没有跳转的功能话可以用搜索快速定位。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image1.png)
+
+
+修改后的文本如下：
+
+
+
+```
+#for bonename, bone, obname, me, armob in ob_bones:
+for my_bone in ob_bones:
+# Always parent to armature now
+if my_bone.parent:
+fw('\n\tConnect: "OO", "Model::%s", "Model::%s"' % (my_bone.fbxName, my_bone.parent.fbxName))
+#else:
+# the armature object is written as an empty and all root level bones connect to it
+#fw('\n\tConnect: "OO", "Model::%s", "Model::%s"' % (my_bone.fbxName, my_bone.fbxArm.fbxName))
+```
+
+然后需要做的事情是到这个地址去下载Blender用的MMD插件：[https://github.com/sugiany/blender_mmd_tools](https://github.com/sugiany/blender_mmd_tools "https://github.com/sugiany/blender_mmd_tools")。下载完成后将mmd_tools文件夹解压到Blender的插件目录。
+
+
+打开Blender，进入用户配置。启用刚刚下载的插件。用MMD这个关键词可以快速的过滤到插件，在选择框上打勾即可。如果启用成功的话，在左边的功能区域就能看到MMD的功能了。如果启用了看不见的话可以试着重启一下Blender。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image2.png)
+
+
+做好了上面的工作之后就可以进行导入的工作了。点击MMD面板上的Model按钮，在弹出的选择窗口左边，将缩放比例调整为8倍。选择想要导入的模型即可，这里选择前几天在贴吧淘到的夏娜模型。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image3.png)
+
+
+之所以在这里做缩放操作，是因为这个插件不支持导入之后做任何缩放。有读刚刚GitHub页面作者说明的童鞋应该有注意到。由于这个限定的关系，为了保证最终导入UE4的单位不会出错，通过计算得出这里的缩放倍数是8。
+
+
+需要注意的是，这里根据模型的不同，导入之后在视图上看到的模型材质可能是灰色的。
+
+
+模型导入之后先不忙着下一步动作，要对模型的骨骼结构进行一下检查。由于UE4是不支持多个骨骼作为根骨骼的，所以对于不符合的模型我们要稍作修改。
+
+
+在右上角的大纲视图中找到骨架，并查看其结构。如果是类似这样的结构就不需要更改了：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb4.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image4.png)
+
+
+这样的就是可以使用的结构，所有的骨骼都在<全ての親>这个节点之下。如果导入之后发现没有这个节点，而是这样的结构：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb5.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image5.png)
+
+
+那么就需要对骨骼结构进行修正。推荐使用PmxEditor进行修正，打开PE，导入刚刚的模型。执行下面的操作即可：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb6.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image6.png)
+
+
+保存之后重新导入Blender，再次检查一下就能进行下一步工作了。
+
+
+模型导入完成之后，接下来就导入动作。这里用的是忘记是哪里下载过来的行走的vmd。导入动作之前注意，保证所有的Object，包括骨骼都处于被选中的状态。Blender全选的快捷键是A。导入时同样调整缩放为8。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb7.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image7.png)
+
+
+完成以上两个操作之后，使用下面的动画预览功能看看模型和骨骼的绑定是否正常。通常缩放设定不一致、导入动画时没有选中骨骼是常见的出错原因。
+
+
+成功导入之后看到的差不多就是这样的模型了：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb8.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image8.png)
+
+
+然后我们把Blender的场景单位调节为与UE4一致，在右边的面板上可以找到场景标签。调整为下面的样子就可以了：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb9.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image9.png)
+
+
+接下来我们可以打开环境光，再加上些光源，拖一个摄像机到视图上。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb10.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image10.png)
+
+
+然后选择最左边的那个面板进行渲染预览，就可以看到并检查是否所有的导入都正常了。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb11.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image11.png)
+
+
+预览渲染如果正常话，就可以开始进行导出操作了。配置上保持默认就可以了，为了防止版本不同引起的问题，配置截图如下：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb12.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image12.png)
+
+
+导出之后的FBX如果直接导入到UE4的话会出错，因为UE4导入FBX时不识别其中的非英文字符，会出现命名冲突错误。由于MMD模型中的日文实在是太多了，想要手动修正显然不现实。于是参照FBX的官方文档，通过FBX SDK写了一个转义工具来解决这个问题。直接从<[这里](http://pan.baidu.com/s/1xW9ye)|共享密码：5xrd|>下载，具体的说明请看<[这里](https://blog.ch-wind.com/fbx文件转义工具/)>。
+
+
+打开工具，点上面的按钮打开fbx，然后点击下面的转换按钮即可。转换成功的话会在同级目录下生成文件名追加了_ue4的fbx文件。
+
+
+这样导出的文件就能成功的导入UE4了，只是由于UE4的导入器目前功能还不是很完善。其导入的结果和3dsmax导入的结果有一定差别。最容易出现的问题就是斗鸡眼了，虽然可以在UE4中进行调整，但这里我们还是将模型导入3dsmax再重新导出一次，对模型格式进行一下规范化。
+
+
+FBX这个文件格式是autodesk定义的，其他软件对fbx的支持或多或少都会有些问题。多次的导入导出很容易出现奇怪的问题。所以出现问题时，用autodesk官方的软件进行一下规范化比较好。
+
+
+导入时保持默认配置不动，会有一些警告信息，不会有什么影响。导入之后是这个效果：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb13.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image13.png)
+
+
+对比下会发现下方丝袜的材质效果有些不明显，材质相关的建议在UE4中进行相应的修正。在这里进行修正需要会使用3dsmax，而且也无法保证UE4对材质的处理和3dsmax完全相同。
+
+
+同时我们会发现动画的帧数变成了100，由于始终没有搞明白3dsmax要怎么用。这里我选择将其发送到MotionBuilder。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb14.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image14.png)
+
+
+发送成功之后，我们会发现夏娜的丝袜又回来了……
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb15.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image15.png)
+
+
+调整好动画的帧数之后，直接导出成FBX。
+
+
+至此，UE4外部的模型转换工作就完成了。
+
+
+打开UE4，新建一个ThirdPerson BluePrint的项目。项目打开之后，到Content Browser，在自己喜欢的位置导入FBX模型。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb16.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image16.png)
+
+
+根据模型文件的不同可能会出现一些警告信息，例如POT、平滑组之类的。一般情况下无视就好了。
+
+
+导入之后效果如下：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb17.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/08/image17.png)
+
+
+唯一的遗憾是表情动画从3dsmax导出之后再导入就消失了，尝试导入到别的3d软件也无法读取到。不是很明白其中的机理，好在从游戏制作的方面来看，表情动画并不是必须的。需要的情况下也可以直接在UE4的编辑器里面拖动骨骼，故而这个问题只能暂时搁置了。
+
+
+到这里模型的导入工作就完成了。材质和光照全部保存默认的情况下，效果不会很好。这些都是之后需要研究的地方，模型导入成功的话就什么都好说了。
+
+

@@ -1,0 +1,119 @@
+---
+layout: post
+status: publish
+published: true
+title: VC上检测内存泄露的神器——vld
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 595
+wordpress_url: http://blog.ch-wind.com/?p=595
+date: '2013-07-20 10:41:53 +0000'
+date_gmt: '2013-07-20 02:41:53 +0000'
+tags: []
+---
+前段在q群里聊天，发现有的童鞋和原来的我一样，不知道怎么去检查代码中的内存泄露。
+
+
+对于我们新手而言，内存泄露的问题其实要到程序准备发布的时候才会察觉到。虽然平时总是会注意到这些问题，但是一旦项目大过某个程度，自然会出现一些无法顾及的地方。内存总是不经意的就泄露了，看着程序边跑内存边增加，着实是一件让人头痛的事情。所以这厢就来介绍下vc下检测内存泄露的优秀工具：[Visual Leak Detector](https://vld.codeplex.com/releases)。
+
+
+Visual Leak Detector其实是基于vc自带的检测工具工作的，虽然知道原理的情况下我们自己也可以做出一个功能类似的东西来。但是又何必再造车轮呢？vld本身是开源项目，想要知道其实现的童鞋可以看看它的代码哦。大致上似乎是基于VC++DEBUGER和CRT库提供的检测和定位内存泄漏的工具，不过作为一个有历史的开源项目，其功能自然没有简单到这种程度。
+
+
+vld简单易用，文档也很丰富，对于内存泄露的具体位置也能以调用堆栈的形式详细的显示出来。在代码上的变动只需要简单的加上#include 就可以了。集成起来也很方便，与其他的第三方库没有区别，而且它本身只工作在debug模式，release的时候根本就不会编译，相当之便利。不知道如何配置的童鞋可以参考下面的来做，注意更改成自己的vld安装路径就好：
+
+
+[![vld](https://blog.ch-wind.com/wp-content/uploads/2013/07/vld-300x111.jpg)](https://blog.ch-wind.com/wp-content/uploads/2013/07/vld.jpg)
+
+
+使用下面的简单代码就可以看到vld是不是在工作：
+
+
+
+```
+#include "stdafx.h"
+#include <vld.h>
+
+class LeakTest
+{
+private:
+	int a;
+	float b;
+public:
+	LeakTest(){
+		a = 4;
+		b = 3.9;
+	}
+};
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	LeakTest* lt = new LeakTest();
+	return 0;
+}
+```
+
+运行之后vs的输出栏下就会有vld的检测结果，类似下面的文字：
+
+
+
+> WARNING: Visual Leak Detector detected memory leaks!
+> 
+> 
+> ---------- Block 1 at 0x003AFFD8: 8 bytes ----------
+> 
+> 
+> Call Stack:
+> 
+> 
+> d:\documents\visual studio 2012\projects\consoleapplication1\consoleapplication1\consoleapplication1.cpp (22): ConsoleApplication1.exe!wmain + 0x7 bytes
+> 
+> 
+> f:\dd\vctools\crt_bld\self_x86\crt\src\crtexe.c (533): ConsoleApplication1.exe!__tmainCRTStartup + 0x19 bytes
+> 
+> 
+> f:\dd\vctools\crt_bld\self_x86\crt\src\crtexe.c (377): ConsoleApplication1.exe!wmainCRTStartup
+> 
+> 
+> 0x7576ED6C (File and line number not available): kernel32.dll!BaseThreadInitThunk + 0x12 bytes
+> 
+> 
+> 0x76EE377B (File and line number not available): ntdll.dll!RtlInitializeExceptionChain + 0xEF bytes
+> 
+> 
+> 0x76EE374E (File and line number not available): ntdll.dll!RtlInitializeExceptionChain + 0xC2 bytes
+> 
+> 
+> Data:
+> 
+> 
+> 04 00 00 00 9A 99 79 40 ......y@ ........
+> 
+> 
+> Visual Leak Detector detected 1 memory leak (44 bytes).
+> 
+> 
+> Largest number used: 44 bytes.
+> 
+> 
+> Total allocations: 44 bytes.
+> 
+> 
+> Visual Leak Detector is now exiting.
+> 
+> 
+
+
+相当的好用吧！
+
+
+vld的最新版可以到官网下载：<https://vld.codeplex.com/releases>
+
+

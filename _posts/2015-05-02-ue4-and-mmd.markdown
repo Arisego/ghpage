@@ -1,0 +1,161 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4与MMD
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1250
+wordpress_url: http://blog.ch-wind.com/?p=1250
+date: '2015-05-02 18:10:17 +0000'
+date_gmt: '2015-05-02 10:10:17 +0000'
+tags:
+- UE4
+- MMD
+---
+上次对MMD的导入进行探索之后已经有大半年过去了，各个工具的版本都更新了不少。导入的方式也发生了很多改变，经过了这些时间的研究和学习，对UE4本身的了解也变深了。因此对mmd的导入进行重新的整理。
+
+
+当前[UE4](https://www.unrealengine.com/zh-CN/)版本4.7.6，[blender](https://www.blender.org/)版本2.7.4，[pmx2fbx](http://stereoarts.jp/)版本Beta_20150428_2，[blender_mmd_tools](https://github.com/sugiany/blender_mmd_tools)版本0.5。
+
+
+导入路径方面，还是采用原先得出的两种方式。事实是，mmd几乎在所有的主流3d建模软件上都有相关的读取工具被制作出来，但是要同时兼顾对pmx格式的兼容以及保留流畅的ue4导入的话，还是这两种导入路径比较方便一些。随着时间不断的前进，各个社区说不定也会对相关工具进行改进。目前而言，blender_mmd_tools算得上是非常好的选择了。
+
+
+## 路径一：PMX2FBX
+
+
+使用pmx2fbx会生成如下这些文件
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image.png)
+
+
+我们需要的只有shana.fbx文件，使用[转义工具](https://blog.ch-wind.com/?p=964)转换编码之后，在UE4中导入
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image1.png)
+
+
+注意去掉Use T0As Ref Pos这个选项，否则导入的模型就有可能使用错误的基础姿势，导致形变动画出错。
+
+
+由于这个工具本身是为了Unity而设计的，所以贴图信息被另外的保存了，导入到UE4时就需要对贴图进行重新调整。使用这个方式导入的主要优点是，可以同时进行多个vmd动作的导入。缺陷是，vmd动作的形变动画无法正确载入，以及需要对材质进行大量的修改。如果使用的模型非常复杂的话，工作量将会变得很大。而在骨骼相同的情况下，动画动作是可以共用的。
+
+
+
+[更新][2015-8-15]
+
+
+经过测试发现，当前最新版本下，VMD中的形变动画是可以手动通过曲线添加到动画中去的。因此，在动画动作比较多的情况下，推荐使用这条路径进行导入。如果材质较为复杂，可以采用路径二中的blender导入方式，但只是单独的导出Mesh，这样就可以利用其中生成的材质了。
+
+
+
+## 路径二：Blender
+
+
+收益于Blender社区的配合和UE的不断改进，目前通过blender进行mmd导入的操作已经非常的方便。
+
+
+在blender方面，已经不需要对fbx的导出插件进行修改就可以直接使用了。blender_mmd_tools的版本也已经进行了更新，当前版本已经可以通过blender进行MMD模型的导入然后重新导出为pmd格式而不出错了。
+
+
+导入路径上，首先的操作依然是对模型进行导入。比例和原先一样，依然是8。
+
+
+![image](https://blog.ch-wind.com/wp-content/uploads/2014/08/image_thumb3.png)
+
+
+导入成功后，选中整个模型，点击RigidBody下的build
+
+
+[![SNAGHTML647002](https://blog.ch-wind.com/wp-content/uploads/2015/05/SNAGHTML647002_thumb.png "SNAGHTML647002")](https://blog.ch-wind.com/wp-content/uploads/2015/05/SNAGHTML647002.png)
+
+
+这个版本的mmd_tools会自动添加一个名为“両目.shadow”的骨骼。为了防止多根骨错误，需要对骨骼的顺序进行调整。进入编辑模式，选中“両目.shadow”，将其父级指定为“全ての親”。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image2.png)
+
+
+然后选中模型，点击mmd_tools工具面板里的Import Motion导入vmd动作。
+
+
+动作导入完成之后，可以添加灯光进行渲染测试。也可以直接进行导出。目前的版本下已经不需要对世界的单位进行修改了，直接进行导出即可。
+
+
+通过[转义工具](https://blog.ch-wind.com/?p=964)进行转换之后，接下来就是在UE4中导入了，导入选项如下。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image3.png)
+
+
+导入之后除了可能的少许材质修正之外，基本可以直接使用了。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb4.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image4.png)
+
+
+这种导入方式最大的好处是，vmd动作中的形变动画也会被保留。同时材质上大体都是正常的，需要进行修改的部分比较少。
+
+
+
+[更新][2015-8-15]
+
+
+本路径受到blender_mmd_tools的版本更新的影响较大。当前版本下，有如下变动：
+
+
+1. 导出之前需要像以前一样，将世界单位改为“公制”-“0.01”
+2. 需要将rigidbodies一列节点从模型的树结构中移出，否则会报多重骨骼以及骨骼重名错误
+
+
+rigidbodies的移出结果大致如下图：
+
+
+[![tq](https://blog.ch-wind.com/wp-content/uploads/2015/05/tq.jpg)](https://blog.ch-wind.com/wp-content/uploads/2015/05/tq.jpg)
+
+
+同时，对于复杂的模型依然会有材质出错的情况。一般情况下出错的修复方式如下，具体情况会有所不同，这种做法权做快速修复：
+
+
+[![2015-08-15_21-27-08](https://blog.ch-wind.com/wp-content/uploads/2015/05/2015-08-15_21-27-08.jpg)](https://blog.ch-wind.com/wp-content/uploads/2015/05/2015-08-15_21-27-08.jpg)
+
+
+参照原始模型进行快速修改即可，之后在游戏制作过程中根据设计的不同再进行材质的进一步加工。
+
+
+
+## 形变动画报错
+
+
+以上两种路径中，在导入过程中，会出现如下错误提示
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb5.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image5.png)
+
+
+主要原因是材质没有启用形变，虽然可以通过手动对提示的材质进行修改。但更加快速的方法是直接拖动右侧的形变动画进行预览，那么相应的材质就会自动的被启用形变了。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb6.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image6.png)
+
+
+等待编译完成并保存之后，错误提示就会消失。形变动画也可以正常使用了。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/05/image_thumb7.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/05/image7.png)
+
+
+--------------------------------------------
+
+
+到目前为止，将MMD作为人物模型导入使用已经基本上可以正常的使用了。对于建模比较苦手的话，直接采用别人建设好的模型和动作数据比较快捷一些。
+
+

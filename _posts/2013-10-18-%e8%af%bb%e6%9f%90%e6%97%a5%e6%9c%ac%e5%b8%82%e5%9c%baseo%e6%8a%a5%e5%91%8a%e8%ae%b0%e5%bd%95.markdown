@@ -1,0 +1,259 @@
+---
+layout: post
+status: publish
+published: true
+title: 读某日本市场SEO报告记录
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 743
+wordpress_url: http://blog.ch-wind.com/?p=743
+date: '2013-10-18 20:53:00 +0000'
+date_gmt: '2013-10-18 12:53:00 +0000'
+tags:
+- IM
+---
+最近对日本的IM市场稍微起了点兴趣，近来受到不少教诲，知道要做自己擅长的事情，而不是胡子眉毛一把抓。所以思来想去就决定自己好好的研究一下日本的IM市场，因为日语这个天然屏障竖在那里多少还是能减缓IMer的脚步的。
+
+
+报告原文：<http://www.slideshare.net/ginzametrics/seo-in-japan-the-definitive-guide-to-seo-and-inbound-marketing-webinar> [可能需要备梯子]。虽然报告是去年的，但是其中的内容还是很有作用的。本来是打算自己留着看的，所以没有进行翻译整理，希望观者诸君各取所需。
+
+
+Google和Yahoo占据日本92%的搜索引擎市场。
+
+
+移动搜索量已经超过了桌面搜索。
+
+
+"Call to Search"
+
+
+60%的用户表示看到过
+
+
+32%的用户表示相应过
+
+
+**What it Takes to Succeed in JP**
+
+
+1. Domain & Hosting Considerations
+
+
+Domain hosting is best served locally.
+
+
+和中国不同，日本的IDN相当的流行。作为EMD获得高权重的现象也比较普遍。
+
+
+.jp域名也会获得更多的权重。
+
+
+2. To Localize or Not to Localize
+
+
+Successful ocalization in Japan relies on two overarching themes: Emotion& Relevancy.
+
+
+本土化，例子居然是hp和akb48，还有奈奈等。说起来度娘也是这样的产物。
+
+
+所以主页的风格也会与传统的美式风格不同。
+
+
+3. Keyword Strategy
+
+
+汉字、平假、片假、罗马音照成关键词分裂
+
+
+Yahoo甚至会对全半角进行区分排名
+
+
+日本人习惯于使用动词的不定式进行搜索，难以让关键词显得自然
+
+
+4. On-Page Fundamentals
+
+
+页面优化依然重要
+
+
+* On-page HTML Elements(H1S, Alts, Anchor Text, etc.)
+* Page Speed/ Load Times
+* Keyword-rich Title Tages
+* Fresh content
+* Quality Copy
+* Use Html Content
+
+
+5. Content
+
+
+**more is better**:Jpapanese users expect to see lots of information. The Wetern meme of "less is more" doesn't work in Japan, so don't be afraid to load up to text-heavy details.
+
+
+Write content specifically for the Japanese user, Don't just translate existing English content - it won't resonte with the user as weill, and you'll miss keyword density opportunities.
+
+
+Highlight Local Management: Trust is a huge part of the online experience in Japan, and demonstrating commitment to the market by highlighting Japanese management can go a long way in cementing that truse.
+
+
+Localize Forms: Remeber, date formating, credit card input fields, name fields etc. are all formed diffenently in Japan.
+
+
+About Us Pages(について) are offen among the most viewd pages on brand sites, especially foreign brands. Put some love to thses pages.
+
+
+Stock Images: Avoid the typical multiracial corporate imagery common in the West - This is Japan, show Japanese people with your brand and products.
+
+
+Above all else, do not just use Google Translate! Users will know. User will disapprove.
+
+
+6. Social
+
+
+Social media in Japan is both highly develope and highly stratified.
+
+
+日本的社交网络高度发达，且碎片化严重：
+
+
+[![slide-44-1024](https://blog.ch-wind.com/wp-content/uploads/2013/10/slide-44-1024_thumb.jpg "slide-44-1024")](https://blog.ch-wind.com/wp-content/uploads/2013/10/slide-44-1024.jpg)
+
+
+StereoType - 相对的你很难看到像是其他国家一样的恶评出现。
+
+
+A Nation of Bloggers: With Over a million blog entries a month, the Japanese are the world's most active bloggers. - 这有可能导致极度发达的Blog产业链导致主机产商没有市场。
+
+
+mixi is slowly dying: For almost a decade, mixi had been Japan's bigges SNS by a wide margin, but the past few years have seen Facebook and Twitter catch up and eclipse the honggrown network. - 日本年轻人群体显然在迅速的抛弃本土的mixi而是更多的奔向了FB和Twitter。
+
+
+FB、Twitter和Mixi显然是主要的社交流量阵地，但是由于Mixi是封闭的系统，所以没有任何SEO价值。
+
+
+Yahoo！知识袋可以很好的留下品牌印象也可以用于外链。
+
+
+像是Glee和Mobage这样的社交游戏网站相当的流行,如果你能搞得动的话做一款社交游戏来引流和建立品牌是非常好的。
+
+
+7. Linking
+
+
+外链建设应当集中于日本本土的网站，来自非日本网站的外链的权重效果很差。
+
+
+使用日文作为锚文本，而不是使用英文。
+
+
+Tip: Place lins with JP anchor text in the footers of other PoS sites.
+
+
+Pay Per Post backlinking programs are pupular in Japan and can be resonably effective at boosting ranking for a low investment.
+
+
+PPP programs also drive solid traffic, especcially those taht run on top blog networks like Ameblo.
+
+
+Tip: PPP programs work great with limited-time campaigns.
+
+
+Don't Expect Transparency
+
+
+Tip: If you want to fully undertake a complete SEO program in Japan, accept that lin building providers will not provide the level of transparencey you're likely used to seeing in other markets. Shoganai yo ne.
+
+
+ 
+
+
+**Sample:**
+
+
+[http://www.mcdonalds.co.jp](http://www.mcdonalds.co.jp/)
+
+
+Light and fast loading
+
+
+Editable content
+
+
+Localized domain
+
+
+Great title & header tags
+
+
+Localized site template
+
+
+ 
+
+
+[http://www.expedia.co.jp](http://www.expedia.co.jp/)
+
+
+Great keyord targeting
+
+
+Localized domain
+
+
+Lengthy content
+
+
+Great title & header tags
+
+
+Localized site template
+
+
+ 
+
+
+<http://www.cosme.net/>
+
+
+High quality of content
+
+
+Social signal integration
+
+
+Great interlinking
+
+
+Targeted keywords
+
+
+Clean & light pages
+
+
+ 
+
+
+**Final Thoughts**
+
+
+1. Go Local Whenever Possible: whether domain hosting, localizing templates and other asses, researching keywords, developing content or building links, look for a Japanese solution.
+
+
+2. Trust Your Guys on the Ground: who better to help provide a local solution than your Japanese team? We've seen man foreign companies fail in their digital endeavors becaose Global refuse to listen to Local.
+
+
+3. Know Your Audience: you may have a clear idea in your head about your target audience in Japan, but understand that there will be cultural diffences in user tendencies and expectations; speak to your Japanese audience.
+
+
+One last time: DO NOT USE GOOGLE TRANSLATE!
+
+

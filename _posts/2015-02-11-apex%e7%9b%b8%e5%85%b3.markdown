@@ -1,0 +1,220 @@
+---
+layout: post
+status: publish
+published: true
+title: APEX相关
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1168
+wordpress_url: http://blog.ch-wind.com/?p=1168
+date: '2015-02-11 21:46:43 +0000'
+date_gmt: '2015-02-11 13:46:43 +0000'
+tags:
+- UE4
+- 物理
+- APEX
+---
+由于UE4使用的是PhysX引擎，因此一些相关的特性需要使用其相关的工具才能实现。当前（4.6.1）版本UE4只支持两个Apex特性，分别是Destruct和Cloth。
+
+
+对官方的讲解视频以及部分文档进行总结，方便以后使用到时可以进行快速的索引。
+
+
+### ① 破碎
+
+
+破碎方面使用PhysX的工具可以获得额外的两种制作方式，同时可以得到当前引擎中没有的多级别破碎效果。
+
+
+**Slice模式切割**
+
+
+官方视频地址：[http://v.youku.com/v_show/id_XNDEzMTM3Mzky.html](http://v.youku.com/v_show/id_XNDEzMTM3Mzky.html "http://v.youku.com/v_show/id_XNDEzMTM3Mzky.html")
+
+
+示例文件目录为PhysXLab目录下的DestructionSamples\Pillar。
+
+
+在文件菜单中选择Import 3D Mesh导入BrickPillar.FBX（其实可以直接打开官方提供的project文件，这样就不用进行文件的导入了）。
+
+
+在上面的工具栏中选择刀形状的切割工具，在右边的工具栏就会出现相应的属性。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image.png)
+
+
+直接点击Fracture按钮或者右上角跳动的F图标，就会生成Slice的破碎
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image1.png)
+
+
+由于没有切面贴图，切面的效果很不理想。因此先在文件菜单中点击Load Texture as Materia来导入材质BrickPillarInt_d.tga。
+
+
+导入之后到Graphic工具中应用切面贴图即可。需要注意的是示例提供的贴图应用时和默认的UV Scale有所不同。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image2.png)
+
+
+在Slice属性中，展开高级模式，可以手动的设置各个坐标上的切割数
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image3.png)
+
+
+通过设置切割深度，可以做出层次更多的切割结果。在工具栏中的预览深度可以调节当前预览的切割效果层次。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb4.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image4.png)
+
+
+其他的一些属性：
+
+
+Use Target Proportions - 使得碎片尽量的保持给定的长宽高比例，这个设置会优先于切割线设置来保持比例。
+
+
+Seams Variation - 使得切割线的分布变得更加的不均匀，有平移和角度两个选项
+
+
+Noise - 有幅度、频率和网格尺寸3个选项，可以使切面表面出现凹凸效果。
+
+
+属性之间的组合能够实现不同的材质破碎效果，在编辑器中进行尝试即可。按F12可以进入预览模式，用锤子进行破坏来模拟实际的效果。
+
+
+**Cut-Out模式切割**
+
+
+官方视频地址：[http://v.youku.com/v_show/id_XMzU1NDY0NTMy.html](http://v.youku.com/v_show/id_XMzU1NDY0NTMy.html "http://v.youku.com/v_show/id_XMzU1NDY0NTMy.html")
+
+
+示例文件目录为PhysXLab目录下的DestructionSamples\Wall。
+
+
+这个模式有两个设置的地方，一个是要调整切割的挡板的位置，另外一个是要选择切割图。全部设置过之后会自动生成两个层次的分割效果。第一层是设置好的挡板的分离，第二层是对分离出来的表面应用切割图进一步分割。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb5.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image5.png)
+
+
+生成之后的效果就是完全按照墙面的砖块进行分割破碎。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb6.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image6.png)
+
+
+切面贴图和Noise的设置基本和Slice模式的相同。
+
+
+切换到Assets工具栏，在第一层级为后面的墙面设置Dont Frature属性，保证其静态。为前面的墙面设置Dont Damage属性，使得所有的伤害被传递到下一个层级，而不是整个墙面对伤害有响应。在第二层级，设置Support Depth为2，同时打开World Overlap，这样一来砖块就会受到世界的支撑。不会出现不自然的瓦解的情况。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb7.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image7.png)
+
+
+可以对这个分割进行进一步的Slice来达到更好的效果
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb8.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image8.png)
+
+
+加上一定的随机之后，砖块就变得可以敲碎了。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb9.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image9.png)
+
+
+可以通过Export Assets导出apb格式的破碎设置供UE4导入。
+
+
+导入时先导入网格文件，然后点击生成可破坏网格之后在其中导入apb文件。在UE4中进行快捷测试的步骤：
+
+
+首先在可破坏物体中
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb10.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image10.png)
+
+
+打开并修改Impact Damage，然后将这个物体拖到地图中。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb11.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image11.png)
+
+
+打开物理模拟和碰撞事件。将物体拖到一定的高度。然后开始模拟，坠落的冲击产生的伤害会使得物体破碎。如果使用的是上面生成的破碎，由于一瞬间产生了很多碎片，并且都在进行物理模拟。很可能会引起卡顿。其实对于小碎片，最好使用粒子效果来替换掉。系统的开销就会大幅度下降了。
+
+
+同时，导入apb时切面材质如果没有的话需要手动导入。也可以直接指定成其他的材质。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb12.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image12.png)
+
+
+上面的导入中，第二个材质就是切面材质了。
+
+
+### ② 衣料
+
+
+衣料的材质制作NVIDIA官方提供了针对3ds max和maya的插件，虽然官方社区有直接使用Physx自带的制作程序的相关说法。但是还是存在不少问题，这里还是直接使用官方提供的流程进行操作比较好。在NVIDIA官方下载好插件并安装后，可以在目录中看到官方提供的文档。详细的参数及其作用可以到其中去参考。
+
+
+制作Cloth材质可以在toolbar上点击这个按钮：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb13.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image13.png)
+
+
+这样的话就会在当前修改器栈中添加一个新的衣料材质修改器，可以在其中进行属性的设置等操作。
+
+
+最主要的属性操作是max distance的喷涂，设定好值之后直接点击按钮即可在材质上喷涂上设定的值。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb14.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image14.png)
+
+
+如果要看模拟的效果，可以直接点击插件提供的模拟按钮。
+
+
+操作完毕之后可以对衣料材质进行导出。当前版本使用下面的配置可以正常的工作：
+
+
+[![SNAGHTML8aa3b0](https://blog.ch-wind.com/wp-content/uploads/2015/02/SNAGHTML8aa3b0_thumb.png "SNAGHTML8aa3b0")](https://blog.ch-wind.com/wp-content/uploads/2015/02/SNAGHTML8aa3b0.png)
+
+
+然后就是在UE4中进行导入了，衣料材质不需要导入到内容管理器中。直接在需要使用到的模型中点击下面的添加材质按钮即可。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb15.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image15.png)
+
+
+添加完毕之后就可以在材质的下方看到Cloth的选框，在其中选择对应的即可。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb16.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image16.png)
+
+
+最终的结果如下，由于是静态图片不怎么能看出效果。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/02/image_thumb17.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/02/image17.png)
+
+
+---------------------------------------------------
+
+
+总体而言，作为UE4外部的制作流程，APEX的操作还是相对简单的。
+
+

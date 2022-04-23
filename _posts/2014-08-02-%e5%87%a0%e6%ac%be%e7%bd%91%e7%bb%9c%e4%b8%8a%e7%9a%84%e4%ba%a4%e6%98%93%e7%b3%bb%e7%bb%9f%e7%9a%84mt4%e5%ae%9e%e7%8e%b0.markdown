@@ -1,0 +1,129 @@
+---
+layout: post
+status: publish
+published: true
+title: 几款网络上的交易系统的MT4实现
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 923
+wordpress_url: http://blog.ch-wind.com/?p=923
+date: '2014-08-02 04:10:37 +0000'
+date_gmt: '2014-08-01 20:10:37 +0000'
+tags: []
+---
+前段研究交易系统的产物，要想快速了解交易系统的构造，最快的方法就是去研究已经成型的交易系统。在此总结和分享一下经验，也为接下来的系统开发理下思路。
+
+
+所有系统的代码在文末。需要注意的是，由于系统都没有提供资金管理的思路，统统使用的是海龟的那套资金管理系统。
+
+
+### 系统一：Lema System
+
+
+网上找到的一个系统，似乎不是什么有名的系统的样子。工作在5分钟图上的短线交易系统。
+
+
+
+> 做多规则：
+> 
+> 
+> –价格在EMA16之上
+> 
+> 
+> –EMA16在EMA48之上
+> 
+> 
+> –Laguerre指标从下上穿0.8水平线
+> 
+> 
+> 止损设在离开仓价位30点以外
+> 
+> 
+> 多头平仓规则:
+> 
+> 
+> 当有20pips 利润的时候，平掉一半的仓位，剩下的仓位等到EMA16向下穿越EMA48全部平仓
+> 
+> 
+> 空头则与此相反。
+> 
+> 
+
+
+[![Image](https://blog.ch-wind.com/wp-content/uploads/2014/07/Image_thumb.png "Image")](https://blog.ch-wind.com/wp-content/uploads/2014/07/Image.png)
+
+
+测试结果发现无法稳定盈利，主要原因应该是因为使用了均线系统作为入场信号。均线一旦处于纠缠的状态就会频繁的发出买卖信号，导致系统失效。虽然使用了Laguerre指标作为过滤，这一点依然是硬伤。
+
+
+### 系统二：R-Breaker
+
+
+根据前一个交易日的收盘价、最高价和最低价数据通过一定方式计算出六个价位，从大到小依次为：突破买入价（Bbreak)、观察卖出价(Ssetup)、反转卖出价(Senter)、反转买入价(Benter)、观察买入价(Bsetup)、突破卖出价(Sbreak)。以此来形成当前交易日盘中交易的触发条件。这里，通过对计算方式的调整。可以调节六个价格间的距离。
+
+
+
+> 交易规则：
+> 
+> 
+> 反转:
+> 
+> 
+> 持多单，当日内最高价超过观察卖出价后，盘中价格出现回落，且进一步跌破反转卖出价构成的支撑线时，采取反转策略，即在该点位反手做空；
+> 
+> 
+> 持空单，当日内最低价低于观察买入价后，盘中价格出现反弹，且进一步超过反转买入价构成的阻力线时，采取反转策略，即在该点位反手做多；
+> 
+> 
+> 突破:
+> 
+> 
+> 在空仓的情况下，如果盘中价格超过突破买入价，则采取趋势策略，即在该点位开仓做多；  
+> 
+> 在空仓的情况下，如果盘中价格跌破突破卖出价，则采取趋势策略，即在该点位开仓做空；
+> 
+> 
+
+
+[![134728031](https://blog.ch-wind.com/wp-content/uploads/2014/07/134728031_thumb.jpg "134728031")](https://blog.ch-wind.com/wp-content/uploads/2014/07/134728031.jpg)
+
+
+使用前一日的波幅来进行当天的波幅划分，在当日结束时清空所有头寸。总体而言似乎没有获得太大的概率优势，感觉上是一个相当微妙的日内交易系统。可能是因为这个交易系统设计上原本不是针对外汇的，故而在外汇上表现平平：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/07/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/07/image3.png)
+
+
+### 系统三：Aberration
+
+
+Aberration系统是一个反向的利用布林带的交易系统，它将价格收在布林带外作为趋势产生的信号入场，并同时在价格报收在布林带中轨的另一边时离场。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/07/image_thumb4.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/07/image4.png)
+
+
+需要注意的是，Aberration和R-Breaker这两个系统并不是完整的，在互联网上公开出来的都是类似于泄露版的规则。由于没有配套的资金管理策略，同时没有详细的规则，所以实现出来的系统表现有些不尽人意。
+
+
+不过Aberration系统当前的规则作为趋势系统并没有很好的表现，很大的可能性在于并不是所有的趋势启动都会由冲破布林带开始。
+
+
+
+>  
+> 
+> 
+> --- 下载地址 ---
+> 
+> 
+> 链接: http://pan.baidu.com/s/1gdiSL7X 密码: 1wbi
+> 
+> 
+
+

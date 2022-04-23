@@ -1,0 +1,180 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4年初笔记汇总
+author:
+ display_name: 风铃
+ login: flinkor
+ email: flinkor@foxmail.com
+ url: ''
+author_login: flinkor
+author_email: flinkor@foxmail.com
+wordpress_id: 2264
+wordpress_url: https://blog.ch-wind.com/?p=2264
+date: '2018-02-26 00:00:00 +0000'
+date_gmt: '2018-02-25 16:00:00 +0000'
+tags:
+- UE4
+- UMG
+---
+18年转眼马上过去两个月了，却有种还什么都没有做的感觉呢。
+
+
+这里是最近的一些记录内容，由于比较零碎细小，干脆就合在一起了。
+
+
+使用的UE4版本为UE4.15。
+
+
+## WidgetBind
+
+
+这个是一个Meta，在UMG的数据绑定时很有用。
+
+
+虽然UMG的逻辑大部分可以在蓝图中完成，而且控件也有自己的UPROPERTY和UFUNCTION绑定机制。
+
+
+但是在需要进行复杂的UI逻辑编写时还是会需要在代码中进行控制。
+
+
+这个时候就会遇到需要对应的UMG控件的指针的问题，虽然可以通过事先定义的UPROPERTY指针然后再在蓝图中进行赋值等一些方法进行。但在使用上多少会有不便之处。
+
+
+其实，UE4内部是有提供方便这种情况的Meta方便使用的：
+
+
+
+```
+UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (BindWidget))
+UImage* ImgBinded;
+```
+
+只要这样定义了之后，再做继承了的蓝图中拉出目标控件然后命名为ImgBinded就可以了。同时也可以将控件指定为可选的，例如：
+
+
+
+```
+UPROPERTY(meta=(BindWidget, OptionalWidget=true))
+```
+
+如果不指定为可选又没有在蓝图中添加对应名称的控件的话，就会报错
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2018/02/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2018/02/image.png)
+
+
+## Console
+
+
+这个也是最近遇到的麻烦，当程序的业务逻辑越来越复杂，往往会多出很多功能上的限制，导致在测试时遇到麻烦。
+
+
+每次都要额外的添加测试UI，将一些C++函数暴露到蓝图，最后测试功能就一片混乱了。此时就可以添加一些Console来方便在编辑器中调试，由于Shipping模式默认是没有Console的，也不用担心一不小心测试代码被放到终端用户手中的尴尬情况。
+
+
+同时，将Console代码进行一定程度的管理，也可以方便将调试功能整合在一起，避免不必要的混乱。
+
+
+UE4的Console系统非常的易于扩展，使用起来也没有什么副作用：
+
+
+
+```
+void HandleDbNextMap()
+{
+    /** <一些调试功能 */;
+}
+
+static FAutoConsoleCommand CVarDbGoNext(
+    TEXT("db.map.jmp"),/** <Console的指令 */
+    TEXT("Jump to nextmap\n"),/** <显示的帮助信息 */
+    FConsoleCommandDelegate::CreateStatic(&HandleDbNextMap)
+);
+```
+
+使用UE4提供的帮助类，能够非常快速的定义Console指令。ConsoleCommand的使用和通常的Delegate是一样的，添加上面的代码后。
+
+
+就可以在Console中输入db.map.jmp来使用了。
+
+
+对于需要输入参数的情况，其实FAutoConsoleCommand还有其他的变体是可以携带参数的，详情可以参考其定义。
+
+
+## Media Frame Work
+
+
+UE4默认使用WMF在Windows上进行视频播放的操作，但是在使用上还是会有些细节的部分。
+
+
+### 二次播放杂音
+
+
+这个Bug一般是自己使用C++进行播放控制时容易出现，使用蓝图进行播放时没有遇到这个问题。
+
+
+问题在于，MediaPlayer的声音播放并不会自动的跟随MediaPlayer的停止、播放、重新开启操作被控制，虽然表面上声音的播放确实停止了，但是重新开始播放声音的话就会出现状态重置不明确的问题，因此需要自己对事件进行绑定会进行控制。
+
+
+
+```
+void UStreamPlayer::HandleMediaPlayerMediaEvent(EMediaEvent Event)
+{
+    if ((AudioComponent == nullptr) /*|| !CurrentSoundWave.IsValid()*/)
+    {
+        return;
+    }
+
+    switch (Event)
+    {
+    case EMediaEvent::PlaybackEndReached:
+    case EMediaEvent::PlaybackSuspended:
+        AudioComponent->Stop();
+        break;
+    case EMediaEvent::PlaybackResumed:
+        AudioComponent->Play();
+        break;
+    }
+}
+```
+
+然后找一个时机绑定到MediaPlayer上去就可以了
+
+
+
+```
+m_pMediaPlayer->OnMediaEvent().AddUObject(this, &UStreamPlayer::HandleMediaPlayerMediaEvent);
+```
+
+这个是在4.15上遇到的，记得之后的版本更新中MediaPlayer有过改动，不知是不是就没有这样的问题了。
+
+
+### 打包后无法播放
+
+
+首先要检查的是打包时对应的视频文件有没有被拷贝到发布目录中，由于UE4打包的时候只会对进行了链接注册的资源进行打包，所以如果视频文件没有被蓝图或者C++显式的引用的话，并不会被自动拷贝到发布目录中去。
+
+
+所以需要在打包设置中进行设置，保证视频目录中的视频都被拷贝到了发行版中。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2018/02/additional-pack.jpg "image")](https://blog.ch-wind.com/wp-content/uploads/2018/02/additional-pack.jpg)
+
+
+当然，也可以手动将资源拷贝到对应的目录中去，不过这样不方便管理，容易忘记……
+
+
+另外就是要检查系统本身的Wmf相关的设定了，最主要就是检查下WindowsMediaPlayer能否正常的播放视频，因为wmp和ue4一样都依赖wmf进行视频播放，所以容易排查问题。主要是有的Ghost的系统会有不必要的精简，导致wmf功能不正常。
+
+
+ 
+
+
+如果你使用的是最新版本的引擎的话，也可以考虑社区提供的[[VlcMedia](https://github.com/ue4plugins/VlcMedia)]的插件，经过测试4.18版本下工作很正常，不过由于这边使用的是4.15版本，就没有办法了呢。
+
+
+同时Vlc还支持更多的播放格式和方式，例如Vlc是支持m3u8的，而wmf并不支持很多流播放的功能。
+
+

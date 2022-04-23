@@ -1,0 +1,34 @@
+---
+layout: post
+status: publish
+published: true
+title: 我的ACG回忆
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 36
+wordpress_url: http://www.ch-wind.com/?p=36
+date: '2011-10-19 17:06:36 +0000'
+date_gmt: '2011-10-19 09:06:36 +0000'
+tags: []
+---
+本来是想怀旧伤感一下的，无奈这样的事情实在是太不适合我了。就算好不容易营造出氛围来，不到一会就没了感觉。于是还是想到什么写什么吧。毕竟写文章这种事情不是很擅长呢。
+
+
+其实真正开始喜欢萌系作品是从寒蝉开始的，虽然之前也断断续续的接触过不少作品，但是总体而言都没什么感觉。看过寒蝉之后我就开始寻觅大家评价不错的作品来看，到最后自然是一发不可收拾了。
+
+
+接触的第一部gal是在gba上连算不算gal都不知道的，有着“纯情房东俏房客”这样当时看来有着危险名字的游戏，不过那时也只是把它和普通游戏一样对待就是了。事后也看了动画化的作品，说起来似乎还有3个ova呢，也是在这个动画中第一次认识到声优的存在。就是至今依然很有人气的堀江由衣，不过现在自己是个不折不扣的香菜党就是了。~~说到香菜，10月番里的香菜似乎很少啊。不过只有三分钟的森田小姐居然还有连载我很惊讶的说。~~
+
+
+个人正式的接触gal的第一个作品是clannad，当时的那份感动现在也依然存在于心中。自那以后也一直接触的是纯爱系的作品什么的当然是谎话了……
+
+
+不过感觉一个人在这里自说自话还真是有够奇怪的，下次我还是找些比较有意义的主题吧。
+
+

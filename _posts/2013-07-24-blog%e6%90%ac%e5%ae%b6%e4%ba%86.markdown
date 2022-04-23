@@ -1,0 +1,37 @@
+---
+layout: post
+status: publish
+published: true
+title: blog搬家了
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 600
+wordpress_url: http://blog.ch-wind.com/?p=600
+date: '2013-07-24 12:35:00 +0000'
+date_gmt: '2013-07-24 04:35:00 +0000'
+tags: []
+---
+最近在生活上发生了巨大的改变，很多方面都还没有回过味来呢。
+
+
+其实hostmonster那边的主机还没有到期的，只是hostmonster的续费价格实在是贵的令人发指。
+
+
+当时注册的时候就有听说主机提供商都是首年价格比较低，续费特别贵。可惜去年到续费的时候因为各种原因根本就没有去管，hostmonster自然是乐于如此，似乎是给我发了封通知自动续费的邮件。也不知道自动续费是不是默认的配置，总之我这边就这样续费了。那时也没多想啥，感觉还挺便利的。
+
+
+没想到前天偶然到hostmonster后台看来了下，居然一年扣了我快1000块！这尼玛……我虽然一直都挂着个blog，但是基本日访问量从来没超过过50个。这也太不经纪了吧！于是果断开始各种搜寻，终于让我找到家香港主机。几番折腾之后，总算是把blog整个搬过来了。
+
+
+虽然说这边的主机商相当明显的在公告里暗示说写软文会有优惠，但是基于个人原则，还是先测试一下这个主机的稳定性在说。况且这边访问量也不大，写软文感觉也没什么多大的作用呢。
+
+
+现在平时的时间总算是空余的多了点的感觉，以后打算多写些东西，虽然主题不够明确不利于SEO什么的，但是又不是营销博客，还是更多的随自己的便好了。
+
+

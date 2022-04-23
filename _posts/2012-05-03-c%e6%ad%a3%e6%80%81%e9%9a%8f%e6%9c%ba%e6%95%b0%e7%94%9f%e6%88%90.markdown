@@ -1,0 +1,81 @@
+---
+layout: post
+status: publish
+published: true
+title: C++正态随机数生成
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 385
+wordpress_url: http://blog.ch-wind.com/?p=385
+date: '2012-05-03 22:04:40 +0000'
+date_gmt: '2012-05-03 14:04:40 +0000'
+tags:
+- c++
+- 正态随机
+---
+最近碰到了c++生成正态随机数的问题，在这里把查到的资料整理一下。
+
+
+正态随机数最便捷的方法是使用libstdc++，在C++11. 26.5-1版本后标准库中已经加入了<random>来处理对随机数的生成。下面的代码就是一个简单的生成过程：
+
+
+
+```
+#include <random>
+#include <time.h>
+#include <iostream>
+
+typedef std::ranlux64_base_01 Myeng;  
+typedef std::normal_distribution<double> Mydist;
+
+int main( int argc, char* args[] )
+{
+
+  Myeng eng;  
+  eng.seed(time(NULL));//将时间作为seed
+  Mydist dist(1.5, 2.0);  
+  Mydist::input_type engval = eng();  
+  Mydist::result_type distval = dist(eng); 
+
+  distval = distval; // 防止出现"xxxx未使用"的报错  
+  engval = engval;  
+
+  std::cout<<d<<std::endl;
+  std::cout << "期望== " << dist.mean() << std::endl;  
+  std::cout << "标准差== " << dist.sigma() << std::endl;  
+
+  dist.reset(); // 清除缓存值  
+  std::cout << "随机数1 == " << dist(eng) << std::endl;  
+  std::cout << "随机数2 == " << dist(eng) << std::endl;  
+  std::cout << "随机数3 == " << dist(eng) << std::endl;  
+
+}
+```
+
+关于random库的更多的内容可参照[参考文档](http://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-api-4.6/a01210.html)，文字太多了我也没仔细看，只是参照别人的代码改了下就拿来用了。
+
+
+当然，如果你没有使用标准库的习惯的话（其实本人也不是很喜欢用标准库），你也可以利用rand()函数自己生成正态随机数。根据采用的数学原理不同，似乎会用很多种方法。下面的是采用由瑞利分布导出的公式为基础来生成正态随机数的。
+
+
+
+```
+double carmen_gaussian_random(double mean, double std)
+{
+  const double norm = 1.0 / (RAND_MAX + 1.0);
+  double u = 1.0 - rand() * norm;                  //u不能为 0 
+  double v = rand() * norm;     //由于是伪随机请自行选择seed来保证更真实的随机
+  double z = sqrt(-2.0 * log(u)) * cos(2.0 * M_PI * v);
+  return mean + std * z;
+}
+```
+
+数学原理的描述是这样的：若x1,x2是（0，1）上的均匀分布则y1=(-2*ln(x1))^.5*cos(2*pi*x2)和y2=(-2*ln(x2))^.5*sin(2*pi*x1)都是标准正态分布的随机数。
+
+

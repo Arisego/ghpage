@@ -1,0 +1,33 @@
+---
+layout: page
+status: publish
+published: true
+exclude: true
+title: FBX文件转义工具
+author:
+  display_name: chaoshikari
+  login: chaoshikari
+  email: chaoshikari@gmail.com
+  url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 964
+wordpress_url: http://blog.ch-wind.com/?page_id=964
+date: '2014-08-22 08:31:43 +0000'
+date_gmt: '2014-08-22 00:31:43 +0000'
+tags: []
+---
+<p>提供将FBX文件内部所有的非英文UTF-8字符转义为ASC-II字符的功能，基于FBX SDK。</p>
+<p>主要的修正对象是MMD模型导出的FBX格式，解决E4导入fbx时不识别非英文字符而导致的包括骨骼命名冲突、形变动画丢失等问题。</p>
+<blockquote><p>&lt;下载地址&gt;<br />
+链接: http://pan.baidu.com/s/1xW9ye 密码: 5xrd</p></blockquote>
+<div class="alert alert-info">|2015-0501| – 添加了配置文件读入功能，在进行第一次转义之后，在生成的csv文件中对转义对应的字符串进行修改后。第二次进行转化时，将会采用设定的配置而不是进行自动转义。</div>
+<p>无法运行时请安装VC2013运行库。</p>
+<p>运行方法是点击上面的导入，导入完成后点击下方的转换按钮，转换成功之后会弹出窗口。</p>
+<p>对于名为sample.fbx的文件，会在目录下生成sample_ue4.fbx以及sample.csv。</p>
+<p>[sample_ue4.fbx]</p>
+<p>转义完成之后的模型文件，本程序只提供字符转义功能，其他的导入问题请参照UE4官方导入指引进行相应的修改。</p>
+<p>[sample.csv]</p>
+<p>该表的作用是方便需要对材质等修改时进行对照，同时作为转化的配置可被读入。由于csv表中含有utf-8字符，如果excel直接打开显示乱码的话请使用excel的导入功能。</p>
+<p>以上。</p>

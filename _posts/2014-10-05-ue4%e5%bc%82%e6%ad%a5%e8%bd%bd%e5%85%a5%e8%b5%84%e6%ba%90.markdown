@@ -1,0 +1,135 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4异步载入资源
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1052
+wordpress_url: http://blog.ch-wind.com/?p=1052
+date: '2014-10-05 17:27:08 +0000'
+date_gmt: '2014-10-05 09:27:08 +0000'
+tags:
+- UE4
+---
+所有的“硬”指针指向的资源都会被UE4在启动时进行载入，为了防止某些情况下引发的巨大延迟，必要的时候我们需要使用异步资源载入系统。
+
+
+当前UE4版本为4.7。
+
+
+本文参考：[https://docs.unrealengine.com/latest/INT/Programming/Assets/AsyncLoading/index.html](https://docs.unrealengine.com/latest/INT/Programming/Assets/AsyncLoading/index.html "https://docs.unrealengine.com/latest/INT/Programming/Assets/AsyncLoading/index.html")进行整理。同时也是研究引擎的记录。
+
+
+对于异步载入有两个类很重要:FStringAssetReferences和TAssetPtr。
+
+
+FStringAssetReferences是对资源(Asset)的“软”引用，这个结构在BP中使用起来就像是UObject指针一样。而TAssetPtr是对FStringAssetReferences的一个弱引用封装，同时规范所指向的类型，可以在需要的时候调用Get()来解析到具体的资源。
+
+
+为了避免理解上的偏差，来实际测试一次是最快的。在代码中添加如下属性：
+
+
+
+```
+UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Test) 
+    FStringAssetReference tf;
+
+UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Test) 
+    TAssetPtr<UTexture2D> ttp;
+```
+
+FstringAssetReference在可视化编辑器中显示如下，确实是可以当作UObject指针来使用：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/10/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/10/image.png)
+
+
+TAssetPtr则显示如下：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/10/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/10/image1.png)
+
+
+大多数时候，异步载入一个单独的资源基本没什么意义，除非他真的很大。如果要批量异步载入资源的话，就需要用到Object Libraries。这个是Content brower用来进行资源筛选和显示的类，在游戏逻辑中使用也是可以的。
+
+
+
+```
+if (!ObjectLibrary)
+{
+       ObjectLibrary = UObjectLibrary::CreateLibrary(BaseClass, false, GIsEditor);
+       ObjectLibrary->AddToRoot();
+}
+ObjectLibrary->LoadAssetDataFromPath(TEXT("/Game/PathWithAllObjectsOfSameType");
+if (bFullyLoad)
+{
+       ObjectLibrary->LoadAssetsFromAssetData();
+}
+```
+
+上面的代码对指定的目录创建了一个Library，并且资源进行了载入操作。第二个步骤并不是必须的：
+
+
+
+```
+TArray<FAssetData> AssetDatas;
+ObjectLibrary->GetAssetDataList(AssetDatas);
+
+for (int32 i = 0; i < AssetDatas.Num(); ++i)
+{
+       FAssetData& AssetData = AssetDatas[i];
+
+       const FString* FoundTypeNameString = AssetData.TagsAndValues.Find(GET_MEMBER_NAME_CHECKED(UAssetObject,TypeName));
+
+       if (FoundTypeNameString && FoundTypeNameString->Contains(TEXT("FooType")))
+       {
+              return AssetData;
+       }
+}
+```
+
+上面的代码在ObjectLibrary中进行筛选并将找到的第一个资源返回。
+
+
+得到AssetData之后可以将其转换为FStringAssetReference，然后使用StreamableManager进行异步载入。
+
+
+
+```
+void UGameCheatManager::GrantItems()
+{
+       TArray<FStringAssetReference> ItemsToStream;
+       FStreamableManager& Streamable = UGameGlobals::Get().StreamableManager;
+       for(int32 i = 0; i < ItemList.Num(); ++i)
+       {
+              ItemsToStream.AddUnique(ItemList[i].ToStringReference());
+       }
+       Streamable.RequestAsyncLoad(ItemsToStream, FStreamableDelegate::CreateUObject(this, &UGameCheatManager::GrantItemsDeferred));
+}
+
+void UGameCheatManager::GrantItemsDeferred()
+{
+       for(int32 i = 0; i < ItemList.Num(); ++i)
+       {
+              UGameItemData* ItemData = ItemList[i].Get();
+              if(ItemData)
+              {
+                     MyPC->GrantItem(ItemData);
+              }
+       }
+}
+```
+
+StreamableManager可以对传递给他的StringReference所引用的资源全部进行载入操作。上面的例子中ItemList的定义为TArray< TAssetPtr<UGameItem> >。也就说针对一个弱引用的列表，获得所有的StringReference之后传递给StreamableManager进行一次性的异步载入。载入之后会调用回调函数以便及时进行处理。在回调函数之前，所有的引用都会被StreamableManager保留，防止其被垃圾回收。
+
+
+如上，将StreamableManager和Object Libaries进行组合使用，即可实现异步的资源载入了。
+
+

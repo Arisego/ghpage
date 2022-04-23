@@ -1,0 +1,43 @@
+---
+layout: post
+status: publish
+published: true
+title: 分隔符
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 512
+wordpress_url: http://blog.ch-wind.com/?p=512
+date: '2012-10-16 11:35:37 +0000'
+date_gmt: '2012-10-16 03:35:37 +0000'
+tags: []
+---
+没有什么想写的。
+
+
+说起来一直都是这样，找不到一个想去写的主题。
+
+
+总是在这里堆砌一些连自己都觉得微妙的东西。
+
+
+犯下错误，然后重新开始；跌倒，然后重新爬起来。希望生活可以按照这样的模式展开就好了。
+
+
+只有在回头看的时候才会发现自己的不成熟，然而我并不喜欢后悔。过去的自己拼尽全力的活着，即便得出的是错误，我也不应该只是用后悔这样的方式来否定它，那样做只不过是不负责任的撇开一切而已。如果没有从一个错误中吸取经验的话，那么哪一天一定又会犯下相似的错误的吧。然而我有没有从错误中得到足够的教训呢，我不清楚，不过我想我已经尽了自己的努力。但是这种事情说到底也只是种自我中心的东西，没有什么可以讨论的必要性在里面呢。
+
+
+所以虽然还有很多的事情没有想清楚，这里还是划下一个分隔符，来把现在和过去进行分隔。
+
+
+不过符号这种东西，大多最后会变得没有什么意义的呢。
+
+
+此刻的我也只能尽己所能的确保现在能够延续到未来，而这个分隔符不会成为毫无意义的东西。
+
+

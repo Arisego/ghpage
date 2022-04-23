@@ -1,0 +1,121 @@
+---
+layout: post
+status: publish
+published: true
+title: Mql4连接DLL的简单尝试
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 878
+wordpress_url: http://blog.ch-wind.com/?p=878
+date: '2014-07-01 22:58:00 +0000'
+date_gmt: '2014-07-01 14:58:00 +0000'
+tags: []
+---
+作为Mt4自动交易和指标的脚本语言的Mql4功能虽然已经很强大，但是还是有不少先天的缺陷。为了弥补这些，同时为了补足本身运行环境限制，Mql4提供了连接Dll运行的功能。
+
+
+一般情况下不会用到这个功能，如果只是要处理报价数据的话，在Mql4中比较方便。但是出于保护代码防止破解、监视系统运行状态、从网络获取资源解析等特殊目的。还是会需要用到Dll的外部扩展的，由于近期不太可能用到，所以只是简单的尝试一下，了解一下大致过程的程度。
+
+
+首先是Dll方面，以Vc6为例，新建一个Dll项目。所有配置都不用修改，保持默认即可。对代码简洁性比较敏感的童鞋可以选择把预编译头之类的去掉。具体的文件结构可以参考末尾提供的工程文件。Dll的接口暴露是在.def文件中定义的，Mql4的数据结构定义可以在官方的示例和帮助文档中找到：
+
+
+
+```
+////////////////////////////////////////////////////////////////////////// 
+#define WIN32_LEAN_AND_MEAN 
+#define MT4_EXPFUNC __declspec(dllexport)
+
+#pragma pack(push,1) 
+struct RateInfo{ 
+    unsigned int ctm; 
+    double open; 
+    double low; 
+    double high; 
+    double close; 
+    double vol; 
+};
+
+struct Mqlstr{ 
+   int      size;       // 32-bit integer, contains size of the buffer, allocated for the string. 
+   LPWSTR   buffer;     // 32-bit address of the buffer, containing the string. 
+   int      reserved;   // 32-bit integer, reserved. 
+};
+
+#pragma pack(pop)
+```
+
+在这里只做简单的尝试，从Mql4中传入字符串并用MessageBox输出。
+
+
+
+```
+MT4_EXPFUNC void __stdcall Hello(WCHAR *say, int tilen) 
+{    
+    std::stringstream ts; 
+    
+    ts << tilen; 
+    ts << "||"; 
+    
+    for(;tilen>0;--tilen){ 
+        ts << (char*)say; 
+        ++say; 
+    }
+
+    MessageBox(NULL, ts.str().c_str(), "hello", NULL); 
+}
+```
+
+这边有个问题，官方的示例中没有明示。Mql4传递过来的是WCHAR的指针，但是其与C++的字符串处理似乎稍有不兼容。所以最后采用了传入字符串长度，并使用Stream读入的解决方案。由于是WCHAR，需要做一些简单的处理，如果不留心的话会出现不可预知的错误。
+
+
+
+```
+#include <TestMql.mqh>
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+//--- indicator buffers mapping
+string ts = "Hello, world";
+Hello(ts, StringLen(ts));
+//---
+return(INIT_SUCCEEDED);
+}
+```
+
+在Mt4中采用上面的方式调用即可，TestMql.mqh的内容如下。通常大的项目才会采用这样的形式，如果没有什么特殊需求也可以直接把这些内容复制到上面去：
+
+
+
+```
+#import "TestMql.dll"
+void Hello(string,int);
+#import
+```
+
+#import就是做DLL导入的MQL4语句，注意保持闭合和提供正确的函数原型。
+
+
+上面的代码运行结果如下：
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/07/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/07/image.png)
+
+
+到此所有的连接工作就完成了。上面的VC代码打包在度娘网盘处：
+
+
+链接: <http://pan.baidu.com/s/1bnb8JfT> 密码: qgor
+
+
+MQL4代码就是上面那些，直接新建指标，复制粘贴即可。
+
+

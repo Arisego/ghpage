@@ -1,0 +1,128 @@
+---
+layout: post
+status: publish
+published: true
+title: 物理模拟
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1126
+wordpress_url: http://blog.ch-wind.com/?p=1126
+date: '2015-01-31 23:17:49 +0000'
+date_gmt: '2015-01-31 15:17:49 +0000'
+tags:
+- UE4
+- 物理
+---
+当前UE4使用PhysX3.3作为物理引擎。
+
+
+**碰撞体生成**
+
+
+碰撞体的生成方式有三种
+
+
+第一种是，简单图形碰撞，提供球体、方体和胶囊三种形状的选择。碰撞成本最低，在很多情况下效果也很不错。
+
+
+第二种是，基于离散定向多面体的生成方式。K-DOP的方式中，K的值越高的话，理论上碰撞的精度就会提高。但是同时的，碰撞的运算量耗费也会提升。官方的配图非常的形象：
+
+
+![kdop_sizes.jpg](http://docs.unrealengine.com/latest/images/Engine/Physics/Collision/Reference/kdop_sizes.jpg)
+
+
+第三种是凸面碰撞，用的是凸包方法。生成的碰撞图形非常的精确，对于模型不规则又要求精确碰撞的情形比较有效。不过相对的，碰撞成本也非常的高。
+
+
+游戏预览中可以使用控制台来打开碰撞调试的开关，打开之后可以看到场景中各个物体的碰撞图形。可以方便进行碰撞的调试。
+
+
+**Physics Constraint**
+
+
+物理约束提供物体之间的连接，根据属性的设置不同会有不同的效果。可以指定连接某个物体的组件，当和人物骨架连接时需要指定连接的骨骼名。连接可以设置选择或者拉伸极限。详细设定可以参照[文档](https://docs.unrealengine.com/latest/INT/Engine/Physics/Constraints/ConstraintsReference/index.html)在引擎中测试。
+
+
+Physics Damping
+
+
+阻尼分为线性的和旋转的两种。30的线性阻尼足以使物体在初始化时抵挡9.8的重力而不下落。使得有力量作用的运动物体停止的最小线性阻尼是100。在没有旋转阻尼的情况下，旋转会永远进行下去。而100的旋转阻尼几乎会立刻停止旋转。在物理约束上也可以应用阻尼，使得运动超过约束设定的限度之后得以作出相应。应用于约束的阻尼的主要选项分别是刚度和阻尼。
+
+
+![Phys_ConstraintDampProps.png](http://docs.unrealengine.com/latest/images/Engine/Physics/Constraints/DampingAndFriction/Phys_ConstraintDampProps.png)
+
+
+**Vehicles**
+
+
+UE4文档和范例中提供了专门的汽车演示，游戏中需要要到时可以直接新建一个sample查看官方的实现即可。
+
+
+**Physical Materials**
+
+
+物理材质是面向物理模拟的材质。可以设定材质的摩擦系数、反弹恢复系数、密度等一些列基本的物理属性。
+
+
+Surface Type
+
+
+表面类型，可以在代码中用来判别的表面类型枚举。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/01/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/01/image1.png)
+
+
+可以在项目属性中设置
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/01/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/01/image2.png)
+
+
+或者在项目的Config\DefaultEngine.ini中添加，如果不觉得麻烦的话：
+
+
+
+```
+[PhysicalMaterial.SurfaceTypes]
+SurfaceType1=Glass
+SurfaceType2=Metal
+SurfaceType3=Wood
+SurfaceType4=Concrete
+...
+SurfaceType30=CollapsedStar
+```
+
+**Physics Sub-Stepping**
+
+
+如果打开这个功能，物理模拟会在一个与游戏逻辑独立的线程中运行。这样在同一帧中就能够就行多次物理演算，其结果是，物理模拟会变得更加的精确和真实。但是对系统资源的消耗也会同步上升。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/01/image_thumb3.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/01/image3.png)
+
+
+**Destructible Mesh**
+
+
+可破坏的网格，在任意一个网格物体上点击右键即可创建可破坏的网格物体
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/01/image_thumb4.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/01/image4.png)
+
+
+破坏网格在接受到伤害事件后就会破碎，详细的文档在[这里](https://docs.unrealengine.com/latest/INT/Engine/Physics/Destructibles/DestructibleProperties/index.html)。想要做出复杂的破坏效果的话，需要用到NVIDIA的Apex。
+
+
+------------------------
+
+
+物理模拟部分大体上就是这些了，如果要做出华丽的效果还需要和粒子系统、音效进行配合。毕竟物理引擎只是对真实环境进行模拟，很多地方还是要依靠代码来进行的。
+
+

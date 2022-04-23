@@ -1,0 +1,74 @@
+---
+layout: post
+status: publish
+published: true
+title: C++中文分割
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 543
+wordpress_url: http://blog.ch-wind.com/?p=543
+date: '2012-12-28 09:35:34 +0000'
+date_gmt: '2012-12-28 01:35:34 +0000'
+tags:
+- c++
+- 字符串
+---
+其实最近一直都有遇到c++内的中文字符串问题，不过一直都通过各种方法绕过了。
+
+
+可是今天遇到了需要将字符串的中文和英文按字符分割的问题，实在是没有取巧的方法了。
+
+
+由于从资源文件读取出来的是utf-8编码，而输出时也是用的utf-8编码。如果在中途对字符串进行转化处理的话实在是没有什么必要性。其实一直很好奇，无论是什么格式的编码，windows都是能正常识别的。最重要的是size和length返回的长度不同的话，那么内部就一定有相应的检测机制。于是，开始找字符编码相关的资料。以结论而言是这样的，UTF-8就是以8位为单元对UCS进行编码。从UCS-2到UTF-8的编码方式如下：
+
+
+UCS-2编码(16进制) UTF-8 字节流(二进制)
+
+
+
+> 
+> 0000 - 007F 0xxxxxxx
+> 
+> 
+> 0080 - 07FF 110xxxxx 10xxxxxx
+> 
+> 
+> 0800 - FFFF 1110xxxx 10xxxxxx 10xxxxxx
+> 
+> 
+> 
+
+
+至于具体编码对应字符是怎样的其实并不重要了，对于分割utf-8字符而言，只要知道编码规则就好了。于是，接下来的工作就简单了。
+
+
+
+```
+sum = strlen(fullline);
+for(int cur = 0;cur<sum;cur++)
+{		
+                char t = fulline[cur];
+		if((t&0xE0) == 0xE0){	//3byte
+				lines = lines + t + fulline[cur+1] + fulline[cur+2];
+				cur += 3;
+
+		}else if((t&0xC0) == 0xC0){//2byte
+				lines = lines + t + fulline[cur+1];
+				cur += 2;
+		}else{//1byte
+			lines = lines + t;
+			cur++;
+		}
+		printf("streaming text:%s",lines.c_str());
+}
+```
+
+至于GB2312编码，由于固定是双字节的，分割上就不会有什么问题了。
+
+

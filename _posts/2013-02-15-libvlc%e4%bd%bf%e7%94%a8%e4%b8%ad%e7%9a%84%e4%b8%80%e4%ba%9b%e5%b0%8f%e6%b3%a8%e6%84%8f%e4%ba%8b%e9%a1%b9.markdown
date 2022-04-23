@@ -1,0 +1,44 @@
+---
+layout: post
+status: publish
+published: true
+title: Libvlc使用中的一些小注意事项
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 560
+wordpress_url: http://blog.ch-wind.com/?p=560
+date: '2013-02-15 15:49:20 +0000'
+date_gmt: '2013-02-15 07:49:20 +0000'
+tags:
+- libvlc
+---
+近日在寻找一个跨平台的视频播放解决方案，最后在libvlc和ffmpeg之间犹豫了许久之后选择了libvlc。
+
+
+虽然二者功能上差不多，但是感觉上libvlc对开发者更友好一点。大概是因为ffmpeg遭遇了不遵守开源协议的某些行为之后的愤慨之类的？不过wiki上的内容全都标注着out of date实在是让没接触过这个库的我有点不放心呢。
+
+
+libvlc的使用非常简单，到官网下载vlc播放器。里面就会有sdk目录，虽然也能下源码，但是源码是没有办法在vs下编译的。无奈电脑上的ide只有vs，也不想再折腾去搞个mingw了，于是就直接使用编译好的lib和dll来使用。
+
+
+libvlc提供的调用接口也很简洁，libvlc_video_set_callbacks直接处理回调就好了。ffmpeg似乎也有类似的功能，但是似乎要自己处理pts之类的东西，不过那是一篇标记为out of date的文章，具体情况就不得而知了。总之整个过程遇到了两个问题：
+
+
+首先就是按照通常的过程把dll和lib以及include放好之后，在运行时却出现了内存访问错误。到网上搜索了之后得到解决方案是将plugins目录拷贝到libvlc的同级目录就好。虽然有60多m，但是其实只要根据自己的需求把多余的都去掉就可以了。毕竟又不是要做视频播放器……
+
+
+之后在release模式下却出现了意想不到的问题，程序直接报错：无法定位程序输入点 __glewVertexAttribPointer 于动态链接库 libvlc.dll 上。这个错误多少有些让人莫名其妙，因为libvlc怎么会提供glew这类的入口点呢？但是程序在debug模式下运行一切正常，究竟是怎么回事呢？到网上搜索后未果，因为错误实在是有点奇葩。让我怀疑我的vs是不是哪里出问题了，差点想要重做系统……
+
+
+最后想起来官方有一篇这样的文章http://wiki.videolan.org/GenerateLibFromDll主要介绍如何生成vs用的lib，当时看到sdk目录已经有lib了就没去实行。但是事实证明我错了，抱着试一试的想法照着官方的方法做了一遍，然后把生成的lib拷贝到项目里。release模式下执行，居然不报错了……
+
+
+总结一下就是这样的两个问题，首先，vlc是靠插件运行的，必须抱着libvlc.dll的同级目录下有需要的plugins。其次如果遇到了奇怪的问题，按照官方的说明自己生成一下lib比较好。
+
+

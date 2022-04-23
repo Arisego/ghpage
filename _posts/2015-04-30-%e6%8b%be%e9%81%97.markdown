@@ -1,0 +1,144 @@
+---
+layout: post
+status: publish
+published: true
+title: 拾遗
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1218
+wordpress_url: http://blog.ch-wind.com/?p=1218
+date: '2015-04-30 11:52:24 +0000'
+date_gmt: '2015-04-30 03:52:24 +0000'
+tags:
+- wordpress
+- iptables
+- 服务器
+- QQ登录
+---
+有的问题，花费了时间解决之后，由于短时间内不会用到，过了一段之后遇到了又需要重新寻找解决方案。故而在此记录下来，以节省时间花费。
+
+
+## QQ登录
+
+
+QQ登录的功能相对简单，但是在进行应用调试的时候可能会遇到这样的问题：
+
+
+QQ登录回调时出现如下的报错：redirect uri is illegal(100010)
+
+
+解决方法是，在URL的结尾加上斜杠，如[http://blog.ch-wind.com/](https://blog.ch-wind.com/)。
+
+
+QQ互联官方对信息的修改有一定延迟，测试时需要适当的拉出空隙。提交之前也最好等待一下，否则审核的时候可能会因为不能正常使用而被拒绝。
+
+
+## IPTABLES
+
+
+Ubuntu上的iptables设置，网上教程很多，但是要做出适合自己需求的配置则需要仔细的研究。
+
+
+配置需求：开放22、80端口。同时服务器需要进行抓取、回调等任务。
+
+
+
+```
+iptables -A INPUT -i lo -j ACCEPT 
+iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT 
+iptables -A INPUT -p tcp --dport 22  -j ACCEPT 
+iptables -A OUTPUT -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT 
+iptables -A INPUT -p tcp -s 0/0 --dport 80 -j ACCEPT 
+iptables -A OUTPUT  -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT 
+iptables -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT 
+iptables -A OUTPUT  -p tcp --dport 80 -j ACCEPT 
+iptables -A INPUT -p tcp -s 0/0 --sport 80 -m state --state ESTABLISHED -j ACCEPT 
+iptables -A INPUT -j DROP
+```
+
+常用命令：
+
+
+
+```
+#保存配置
+iptables-save
+
+#列出当前配置
+iptables -L
+```
+
+## 服务器空间问题
+
+
+服务器出现/dev/xvda1达到100%或者文件写入被拒绝write failed: No space left on device时的解决方法。
+
+
+使用命令
+
+
+
+```
+df –h
+```
+
+检查是否有除此之外的异常配比，如果没有的情况下，切换到根目录，通过目录大小进行排查
+
+
+
+```
+du -h --max-depth=1 ./
+```
+
+通过列出的大小逐级寻找，可以定位出问题文件夹。
+
+
+如果在根目录列出的大小和/dev/xvda1的大小差异极大，那么问有可能是文件删除之后依然被某些进程打开，导致无端占用磁盘空间。列出所有这些文件
+
+
+
+```
+lsof | grep "(deleted)"
+```
+
+之后就是寻找这些文件产生原因的地狱之旅了……紧急情况下可以使用重启的方法来暂时缓解危机。
+
+
+## Bootsrap与Wordpress
+
+
+当使用bootstrap做主题时，顶部的置顶导航条会和管理功能的admin-bar产生冲突。解决方法是，
+
+
+首先，对body的class进行修改(通常在header.php中)
+
+
+
+```
+<body <?php body_class(); ?>>
+```
+
+然后添加对应的css：
+
+
+
+```
+@media ( min-width: 782px ) {body{ padding-top: 70px !important; }}
+
+body.body-logged-in .navbar-fixed-top{ top: 28px !important; }
+
+body.logged-in .navbar-fixed-top{ top: 28px !important; }
+```
+
+刷新一下之后，应该就不会出现相互遮盖的问题了。
+
+
+注意：当前使用的wordpress版本4.2.1，版本不同的情况下解决方法可能会出现不同。
+
+

@@ -1,0 +1,235 @@
+---
+layout: post
+status: publish
+published: true
+title: CEDEC2016-《街头霸王5》的美术设计笔记
+author:
+ display_name: 风铃
+ login: flinkor
+ email: flinkor@foxmail.com
+ url: ''
+author_login: flinkor
+author_email: flinkor@foxmail.com
+wordpress_id: 3350
+wordpress_url: https://blog.ch-wind.com/?p=3350
+date: '2021-01-24 12:00:44 +0000'
+date_gmt: '2021-01-24 04:00:44 +0000'
+tags:
+- CEDEC
+- NPR
+---
+CEDEC2016上街霸5的分享。
+
+
+主要参考以下内容：
+
+
+PPT: <https://cedil.cesa.or.jp/cedil_sessions/view/1540>
+
+
+gamesindustry.biz: <https://jp.gamesindustry.biz/article/1609/16090703/>
+
+
+街霸5，是使用UE4制作的。
+
+
+## 格斗游戏美术制作
+
+
+格斗游戏要让玩家能够瞬间对状况进行把握，所以很多地方不会遵循现实规律。
+
+
+卡普空的街霸项目组内部，有一整套相关的方法论：
+
+
+[![image-20210120205628473](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120205628473_thumb.png "image-20210120205628473")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120205628473.png)
+
+
+在像素时代有着非常大的作用，但是由于并不是完全按照现实的身体构造来的，要使用3D来制作就会有些问题。
+
+
+### 模型身高
+
+
+在官方设定中，隆的身高是175cm，而贝卡的身高是182cm。
+
+
+[![image-20210120210652818](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120210652818_thumb.png "image-20210120210652818")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120210652818.png)
+
+
+但是在3D模型上看，两人的身高基本差不多。
+
+
+最终选择以玩家能看到的印象为主，在战斗中待机时，让贝卡的动作改为直立来解决
+
+
+[![image-20210120210717273](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120210717273_thumb.png "image-20210120210717273")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120210717273.png)
+
+
+实际上就变成了这样：
+
+
+[![image-20210120210739498](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120210739498_thumb.png "image-20210120210739498")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120210739498.png)
+
+
+### 动画
+
+
+角色的动画在制作时主要考虑三个方面：
+
+
+* 格斗技：空手道专家一眼就明白是怎样的攻击方式
+* 重心与节奏：看起来要帅要流畅
+* 性能：格斗游戏设计上的攻击判定
+
+
+[![image-20210120211322219](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120211322219_thumb.png "image-20210120211322219")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120211322219.png)
+
+
+例如：桑吉尔夫的行走动画，刻意采用了正面视角进行动作的修正。防止实际上是以一种怪异的姿势在走路。
+
+
+另外，为了表现原本的2D游戏中的感觉，部分角色的姿势采取了旋转5度的形式。
+
+
+[![image-20210120212141746](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212141746_thumb.png "image-20210120212141746")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212141746.png)
+
+
+必杀技的设计上，一定要让玩家能够轻松的使用语句对其进行描述，这样才能让玩家方便的共享感动的情绪。
+
+
+### 背景中的颜色设计
+
+
+要让背景与角色有很好的层次感，以下是2D时代的例子：
+
+
+[![image-20210120212427714](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212427714_thumb.png "image-20210120212427714")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212427714.png)
+
+
+为了在3D世界上达到这个效果，实现了Multi Color Grading的功能：
+
+
+[![image-20210120212640514](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212640514_thumb.png "image-20210120212640514")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212640514.png)
+
+
+场景的不同区域采用了不同的LookupTable。上图的例子并不是针对所有的场景，对于不同的场景会根据其特点采用不同的Multi Color Grading分布。
+
+
+### 摄像角度修正
+
+
+如果使用默认的3D摄像，角色越靠近边缘时，就会出现扭曲，导致影响玩家对攻击判定的感觉。
+
+
+[![image-20210120212904843](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212904843_thumb.png "image-20210120212904843")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120212904843.png)
+
+
+对投影的方式进行了修改，采用了Fix Projection
+
+
+[![image-20210120213012818](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120213012818_thumb.png "image-20210120213012818")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120213012818.png)
+
+
+这种投影的修正只针对角色，可以让角色从背景中突显出来的同时保证角色不会因为在画面中移动出现“扭曲”。
+
+
+## NPR
+
+
+SFV的画面目标是油画的风格以及丰富的色彩。
+
+
+在光照向量与模型法线上作了很多的研究。
+
+
+[![image-20210120213351356](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120213351356_thumb.png "image-20210120213351356")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120213351356.png)
+
+
+最终的材质并不会特别复杂：
+
+
+[![image-20210120213524861](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120213524861_thumb.png "image-20210120213524861")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120213524861.png)
+
+
+### 笔触感的再现
+
+
+前作SFIV，是通过在法线贴图上直接添加皱纹感来实现的。
+
+
+操作上，是在PhostoShop中使用*ちりめんじわ*的功能对法线贴图直接进行处理。
+
+
+SFV由于包括法线贴图在内的所有贴图的分辨率都上升了，导致使用这个方法产生的纹路很难在渲染结果上体现纹路感。最终，使用了Photoshop的SnapArt插件来对图片进行修正，这个插件本来是给图片添加油画感的。
+
+
+为了能够使用这个插件，法线贴图的处理流程稍稍变长了：
+
+
+[![image-20210120214144524](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214144524_thumb.png "image-20210120214144524")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214144524.png)
+
+
+会先将法线贴图转换到Object Space，经过SnapArt的处理后再重新转换回来。
+
+
+对于身体的不同部分，会采用不同的处理程度：
+
+
+[![image-20210120214255524](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214255524_thumb.png "image-20210120214255524")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214255524.png)
+
+
+以实现在游戏中信息密度的控制：
+
+
+[![image-20210120214326820](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214326820_thumb.png "image-20210120214326820")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214326820.png)
+
+
+### 边界的强调
+
+
+与传统的根据法线计算轮廓线的方法不同，是使用颜色来进行的。在渲染结果中，当像素的RGB的颜色差很大时，填充轮廓线。
+
+
+首先将渲染结果左右移位n个像素然后相减：
+
+
+[![image-20210120214718395](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214718395_thumb.png "image-20210120214718395")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214718395.png)
+
+
+[![image-20210120214733171](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214733171_thumb.png "image-20210120214733171")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214733171.png)
+
+
+[![image-20210120214744645](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214744645_thumb.png "image-20210120214744645")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214744645.png)
+
+
+同样的操作在上下方向上再执行一次，然后将两个结果相加：
+
+
+[![image-20210120214812460](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214812460_thumb.png "image-20210120214812460")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120214812460.png)
+
+
+再乘以当前场景所设置的轮廓线颜色，最后叠加到原图上就可以了。
+
+
+[![image-20210120215208468](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120215208468_thumb.png "image-20210120215208468")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120215208468.png)
+
+
+这个效果是在PostProcess上完成的。
+
+
+### 间接光
+
+
+SFV引入Enlighten，在虚幻默认的ILC的基础上更加强化了间接光照的效果
+
+
+[![image-20210120215346772](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120215346772_thumb.png "image-20210120215346772")](https://blog.ch-wind.com/wp-content/uploads/2021/01/image-20210120215346772.png)
+
+
+Enlighten的作用是，可以实时的对间接光照的效果进行调整。比如，想要让间接光的色调变青的话，就加重青的要素。这与想要接近油画画风而不是真实的物理光照的目标相一致。
+
+
+Enlighten只要在场景构造没有变的情况下，可以自由的调整间接光的效果，可以说非常的符合需求。
+
+

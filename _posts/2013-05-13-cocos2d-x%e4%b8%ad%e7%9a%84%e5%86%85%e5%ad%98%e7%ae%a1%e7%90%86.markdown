@@ -1,0 +1,100 @@
+---
+layout: post
+status: publish
+published: true
+title: cocos2d-x中的内存管理
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 588
+wordpress_url: http://blog.ch-wind.com/?p=588
+date: '2013-05-13 11:23:04 +0000'
+date_gmt: '2013-05-13 03:23:04 +0000'
+tags:
+- cocos2d-x
+---
+前段和cocos2d-x的内存管理机制纠结了一阵，现在对整个过程总结整理一下。
+
+
+cocos2d-x使用的是一套自己的引用计数系统来进行内存管理的，一般情况下我们使用creat函数来创建一个类的实例，在不需要时调用release函数进行释放。这时候有一点事需要注意的，那就是使用new来创建和creat函数创建的对象在引用计数上是不同的。如果不留心的话，就可能造成内存泄露甚至更奇特的bug。另外，如果尝试直接delete的话，将极有可能导致引擎崩溃。
+
+
+引擎内部对引用计数的管理是这样的：
+
+
+首先，在CCObject类的构造函数中，将引用计数初始化为1。
+
+
+
+```
+CCObject::CCObject(void)
+:m_uAutoReleaseCount(0)
+,m_uReference(1) // when the object is created, the reference count of it is 1
+,m_nLuaID(0)
+{
+    static unsigned int uObjectCount = 0;
+
+    m_uID = ++uObjectCount;
+}
+```
+
+然后，如果是使用create函数的话就会执行一次autorelease函数，将对象添加到内存管理池中。
+
+
+
+```
+CCSprite* CCSprite::createWithTexture(CCTexture2D *pTexture, const CCRect& rect)
+{
+    CCSprite *pobSprite = new CCSprite();
+    if (pobSprite && pobSprite->initWithTexture(pTexture, rect))
+    {
+        pobSprite->autorelease();
+        return pobSprite;
+    }
+    CC_SAFE_DELETE(pobSprite);
+    return NULL;
+}
+```
+
+引擎内部任何会保有对象指针的操作如无例外都会自动调用retain来增加引用计数，例如ccdictionary添加元素、addchild、scheduleupdate等。
+
+
+
+```
+void ccArrayAppendObject(ccArray *arr, CCObject* object)
+{
+    CCAssert(object != NULL, "Invalid parameter!");
+    object->retain();
+	arr->arr[arr->num] = object;
+	arr->num++;
+}
+```
+
+而当一个对象的release的时候会对引用计数进行判断。
+
+
+
+```
+void CCObject::release(void)
+{
+    CCAssert(m_uReference > 0, "reference count should greater than 0");
+    --m_uReference;
+
+    if (m_uReference == 0)
+    {
+        delete this;
+    }
+}
+```
+
+使用的时候只要注意凡是自己通过new创建的对象都要自己负责release就可以了。另外需要注意的是autorelease这个操作可能会造成误解的地方，sharedPoolManager对对象的管理是一次性的，在一个帧循环之后就不会再持有对象的引用。autorelease的主要可以用于没有办法当即释放对象的情况下将释放操作保留到循环结束之后。
+
+
+引用计数的工作方式导致了在使用多线程时需要注意的问题，由于autoreleasepool本身并不是线程安全的，所以在线程中应该避免使用create函数来创建对象。尤其小心CCFileUtils::sharedFileUtils()->fullPathFromRelativePath(filename);这个函数内部使用了create函数创建的对象，可能会返回错误的值，照成不可预知的bug。
+
+

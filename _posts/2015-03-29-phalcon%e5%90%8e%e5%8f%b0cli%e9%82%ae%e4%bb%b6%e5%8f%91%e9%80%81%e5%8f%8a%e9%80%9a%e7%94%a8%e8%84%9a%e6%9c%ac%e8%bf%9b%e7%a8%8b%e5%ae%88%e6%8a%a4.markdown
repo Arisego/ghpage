@@ -1,0 +1,466 @@
+---
+layout: post
+status: publish
+published: true
+title: Phalcon后台CLI邮件发送及通用脚本进程守护
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1199
+wordpress_url: http://blog.ch-wind.com/?p=1199
+date: '2015-03-29 15:38:58 +0000'
+date_gmt: '2015-03-29 07:38:58 +0000'
+tags:
+- phalcon
+- php
+- cron
+- 守护
+---
+服务器经常需要使用到一些比较耗费时间，却又不需要太强的用户实时性的任务。例如电子邮件的发送、资源抓取之类的。这些任务转到服务器后台执行相对来说比较有效率。
+
+
+当前环境：Ubuntu14.04 LTS，Php5.6.7，Phalcon1.3.4
+
+
+### 一、Phalcon内部的工作
+
+
+Phalcon提供了CLI的模块，不过以结果而言基本没用上核心的功能。因为CLI不是面向用户的，就一切从简了。PHP的邮件发送功能使用的是[PHPMailer](https://github.com/PHPMailer/PHPMailer)，使用简单，包括Wordpress在内的很多项目都有在使用它。首先要做的是将其包装成Phalcon的一个组件，在Library目录内新建一个组件Mail.php。同时将phpmailer拷贝到这个目录中。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/03/image_thumb1.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/03/image1.png)
+
+
+当前使用中的代码是这样的：
+
+
+
+```
+<?php
+
+use Phalcon\Mvc\User\Component;
+use Phalcon\Mvc\View;
+use Phalcon\Config\Adapter\Ini as ConfigIni;
+require 'phpmailer/PHPMailerAutoload.php';
+
+class Mail extends Component
+{
+    /* 发送确认邮件 */
+    public function ConfirmMail($toaddr, $data){
+        /* 解析邮件数据 */
+        $jsdata = json_decode($data, true);
+        $addr = $jsdata['addr'];
+        $time = $jsdata['time'];
+        $toname = $jsdata['name'];
+        /* 生成邮件模板|这里的simpleView在下面的cli-bootstrap中构造 */
+        $view = clone $this->simpleView;
+
+        $view->sitename = '发件人';
+        $view->siteaddr = '#';
+        $view->addr     = $addr;
+        $view->curtime     = $time;
+        $view->username = $toname;
+        $view->render('emails/confirm');
+
+        $content = $view->getContent();
+        $sub = $view->sitename."邮箱认证";
+        /* 发送邮件 */
+        return $this->_SendMail($toaddr, $toname, $sub, $content);
+    }   
+
+    /* ...... 一些其他功能 ...... */
+    /* 发送邮件 */
+    protected function _SendMail($addr, $name, $sub, $content)
+    {
+        /* 这里的参数说明请参照phpmailer的文档 */
+        $mail = new PHPMailer;
+        $mail->setLanguage('zh_cn');
+        $mail->CharSet = "UTF-8";
+        $mail->isSMTP();
+        $mail->SMTPDebug = 2;   
+        $mail->Debugoutput = 'html';
+        $mail->Host = "smtp.qq.com";
+        $mail->Port = 25;
+        $mail->SMTPAuth = true;
+        $mail->Username = "no-reply@xxxx.com";
+        $mail->Password = "password";
+        $mail->setFrom('no-reply@xxxx.com', '发件人');
+        $mail->addReplyTo('no-reply@xxxx.com', '发件人');
+        $mail->addAddress($addr, $name);
+        $mail->Subject = $sub;
+        $mail->msgHTML($content);   
+
+        if (!$mail->send()) {
+            echo "邮件发送错误: " . $mail->ErrorInfo;
+            return false;
+        } else {
+            echo "邮件发送成功!";
+            return true;
+        }
+    }
+
+}
+```
+
+模块部分就像上面一样就可以了，CLI部分的结构参照官方给出的CLI结构进行。首先写一个通用的cli-bootstrap。所有的CLI都放在一个无法被外部访问的目录比较安全，如果是和我一样仿照Invo的文件结构的话，在根目录新建一个文件夹专门存放CLI脚本即可。当前使用的cli-bootsrap如下。
+
+
+
+```
+<?php
+
+error_reporting(E_ALL);
+
+use Phalcon\Mvc\Application;
+use Phalcon\Config\Adapter\Ini as ConfigIni;
+
+try {
+
+    define('APP_PATH', realpath('..') . '/');
+
+    $config = new ConfigIni(APP_PATH . 'app/config/config.ini');
+    require APP_PATH . 'app/config/loader.php';
+    require APP_PATH . 'app/config/services.php';
+    /* 使用一个独立的view来为CLI生成网页 */
+    $di->set('simpleView', function() use ($config) {
+        $view = new Phalcon\Mvc\View\Simple();
+        $view->setViewsDir(APP_PATH . $config->application->viewsDir);
+        /* 这个步骤非常重要，否则在一个di中将无法正常的生成多个网页模板 */
+        $view->registerEngines(array(      
+            '.phtml' => function ($view, $di) use ($config) {
+                $phtml = new \Phalcon\Mvc\View\Engine\Php($view, $di);
+                return $phtml;
+            },     
+            '.volt' => function ($view, $di) use ($config) {
+                $volt = new  \Phalcon\Mvc\View\Engine\Volt($view, $di);          
+                return $volt;
+            }
+        ));
+        return $view;
+    });
+
+    $di = new \Phalcon\DI\FactoryDefault();
+} catch (Exception $e){
+    echo $e->getMessage();
+}
+```
+
+然后编写需要的邮件发送脚本就好了，邮件需要使用到的图片等文件保存在脚本所在目录。
+
+
+
+```
+<?php
+
+require 'cli-bootstrap.php';
+
+use Phosphorum\Mail\SendSpool;
+
+class SendSpoolTask extends Phalcon\DI\Injectable
+{
+
+    public function run()
+    {
+        /* 从数据库中读取需要发送的邮件配置 */
+        $csmails = CSMail::find(array(
+            "status = 'N' and retry <3",
+            "order" => "id",
+            "limit" => 10
+        ));
+
+        if(count($csmails)){
+            $res = false;
+            foreach ($csmails as $csma) {
+            $res = false;
+            $type = $csma->type;
+                switch($type){
+                    case 1:
+                    {
+                        /* 通过Mail模块进行邮件发送 */
+                        $res = $this->mail->ConfirmMail($csma->to, $csma->data);
+                        break;
+                    }
+                    case 2:
+                    {
+                        $res = $this->mail->RecpassMail($csma->to, $csma->data);
+                        break;
+                    }
+                }
+                if($res) {
+                    $csma->status = 'Y';
+                }else{
+                    $csma->retry += 1;
+                }
+                $csma->save();
+            }
+
+            unset($csma);
+        }else{
+            sleep(60);        // 检测间隔
+        }
+
+    }
+}
+
+try {
+    $task = new SendSpoolTask($config);
+    while(true){
+        $task->run();
+    }
+} catch(Exception $e) {
+    echo $e->getMessage(), PHP_EOL;
+    echo $e->getTraceAsString();
+}
+```
+
+在上面的代码中没有包含mail模块的注册代码，如果之前没有进行过类似的工作的话，请参考下面的代码：
+
+
+
+```
+/* 注册邮件发送类 */
+$di->set('mail', function(){
+    return new Mail();
+});
+```
+
+至此，phalcon内部的操作就算是完成了，手工进行脚本执行就会开始读取数据库并发送邮件。
+
+
+### 二、后台执行和进程守护
+
+
+由于之前并没有进行过这方面的操作，在完成上面的代码之后。发现要让脚本后台执行会遇到不少问题，要保证服务器在大多数情况下都能持续的执行我们想要的操作会有不少未知的问题。虽然Phalcon官方提供了Beanstalk队列的实现，php也有很多Resque这样的队列解决方案，但是在功能代码完成的情况下要再对这些进行修改并且再去学习相关的队列的操作学习的话，时间成本上实在太高。而且我们需要的无间断执行和消息队列的功能设计上也有微妙的差别。在这里犹豫了一段之后，果断决定自己动手，丰衣足食。
+
+
+好在linux系统上要自己编码的成本还是比较低的。努力回想起关于信号量的知识，参考Google搜索的资料完成了下面的代码。
+
+
+|2015-0501| - 更新到实际生产环境使用的版本，修复bug，简化代码，删除调试输出。
+
+```
+#include <iostream>
+#include <fstream>
+#include <list>
+#include <map>
+#include <stdio.h>
+#include <unistd.h>
+#include  <sys/wait.h>  /* for waitpid */
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+
+#define  RETRY_INTER  30  /* 重试间隔 */
+
+using namespace std;
+
+const int       SEM_PRMS    = 0644;
+const key_t    SEM_KEY        =  342345;
+
+bool Exists(key_t _nKey)
+{
+    int nID = semget(_nKey, 0, 0);
+    if (nID == -1) return false;
+
+    return semctl(nID, 0, GETVAL, NULL) > 0;
+}
+
+bool Mark(key_t _nKey)
+{
+    int nID = semget(_nKey, 0, 0);
+    if (nID == -1)
+        nID = semget(_nKey, 1, IPC_CREAT | IPC_EXCL | SEM_PRMS);
+
+    struct sembuf buf[2];
+    buf[0].sem_num = 0;
+    buf[0].sem_op = 0;
+    buf[0].sem_flg = IPC_NOWAIT;
+    buf[1].sem_num = 0;
+    buf[1].sem_op = 1;
+    buf[1].sem_flg = SEM_UNDO;//进程退出时自动回滚
+    return semop(nID, &buf[0], 2) == 0;
+}
+
+bool Unmark(key_t _nKey)
+{
+    int nID = semget(_nKey, 0, 0);
+    if (nID == -1) return true;
+    return semctl(nID, 0, IPC_RMID, 0) == 0;
+}
+
+// 维护PHP脚本的运行
+bool PhpFork(const string & tsn)
+{
+
+	pid_t tpid = fork();
+	if(tpid == 0){
+		printf("执行进程开始: %s|pid = %d\n", tsn.c_str(),getpid());
+		key_t tk = ftok(tsn.c_str(),SEM_KEY);
+		if(Exists(tk)){
+			cout << "执行进程出错: 信号量已经存在: "<<  tsn  << endl;
+			sleep(RETRY_INTER);
+			return true;
+		}
+
+		if(!Mark(tk)){
+			cout << "执行进程出错：锁定信号量失败" << endl;
+			sleep(RETRY_INTER);
+			return true;
+		}
+		
+		sleep(RETRY_INTER);
+		cout << "执行进程即将开始。" << endl;
+
+		printf("执行进程出错：%s|%d \n", tsn.c_str(),execl("/usr/bin/php","/usr/bin/php",tsn.c_str(), (char *)NULL) );
+		return true;
+	}else{
+		return false;
+	}
+
+}
+
+int main(void)
+{
+
+    if(Exists(SEM_KEY)){
+        //cout << "失败：已经有一个Guard实例" << endl;
+        return 1;
+    }
+
+    if(!Mark(SEM_KEY)){
+        //cout << "失败：尝试进行信号量锁定失败" << endl;
+        return 2;
+    }
+
+	printf("Guard开始运许|pid = %d\n", getpid());
+
+    // 读取列表
+    list<string>    SList;
+    //cout << "开始读取文件列表" << endl;
+    ifstream fin("List.txt");
+    string s;
+    while( fin >> s )
+    {
+        //cout << "- 文件: " << s << endl;
+        SList.push_back(s);
+    }
+    fin.close();
+
+    if(SList.size() == 0){
+        //cout << "失败：文件类表不存在或内容为空" << endl;
+        return 3;
+    }
+    //cout << "文件列表读取结束" << endl;
+    // 对列表进行信号量检测
+    for(list<string>::iterator it = SList.begin(); it != SList.end(); ++it){
+        string ts = *it;
+
+       // cout << "- 开始检测脚本" << ts << endl;
+        key_t tk = ftok(ts.c_str(),SEM_KEY);
+        if(tk == -1){
+            //cout << "失败：文件未找到" << endl;
+            return 4;
+        }
+
+        if(Exists(tk)){
+            //cout << "失败：信号量已经存在，请先检查是否还有Guard后台进程没有被关闭。如果没有在运行的进程，请更换本脚本的名称。" << endl;
+            return 5;
+        }
+
+        //cout << "- 正常" << endl;
+    }
+   // cout << "文件列表检测结束" << endl;
+
+    // 开始执行脚本
+    for(list<string>::iterator it = SList.begin(); it != SList.end(); ++it){
+        if(PhpFork(*it)) return 9;
+    }
+
+    pid_t bck = 0;
+    while(true){
+        bck = wait(NULL);
+        if(bck == -1) break;
+        printf("子进程返回：pid = %d \n", bck);
+
+		int ci = 0;
+        for(list<string>::iterator it = SList.begin(); it != SList.end(); ++it){
+            string tsn = *it;
+            key_t tk = ftok(tsn.c_str(),SEM_KEY);
+            if(!Exists(tk)){
+                printf("尝试重启脚本：%s \n", tsn.c_str());
+				++ci;
+                if(PhpFork(*it)) return 9;
+				else break;
+            }	
+        }
+		if(ci) sleep(5);
+    }
+
+    cout << "Guard执行结束" << endl;
+	
+	return 0;
+}
+
+```
+
+功能上的一些解释：使用信号量来对进程的状态进行管理，通过读取List.txt中的脚本列表来执行对应的脚本。主guard进程会锁定信号量，防止crontab重复的运行guard进程。信号量的SEM_UNDO参数会使得系统在进程退出时自动清除其锁定的信号量，而ftok会根据文件路径生成一个唯一的token来作为信号量名称。使用wait等待进程的结束信号，在万一的情况下对脚本运行进行恢复。而guard的持续运行则依靠linux的cron服务进行管理。
+
+
+将代码上传到脚本同一个目录，对其进行编译然后执行，然后使用crontab进行守护即可。对于某些操作不是很熟悉的童鞋可以参考下面的命令：
+
+
+
+```
+#编译
+g++ guard.cpp -o guard
+#执行
+./guanrd
+
+```
+
+如果在使用进程查看命令
+
+
+
+```
+ps -ef | grep guard
+```
+
+确定后台没有guard的进程的话，极有可能是和别的进程的信号量冲突了，将代码中guard的信号量修改后重新编译即可。脚本的信号量冲突时对脚本进行重命名即可，同样在操作之前确认下是否有后台进程仍在执行。
+
+
+crontab相关指令
+
+
+
+```
+# 清空cron列表
+
+crontab –r
+
+#列出crontab的状态
+crontab –l 
+
+# 编辑cron
+crontab –e
+
+# 每五分钟尝试重启guard并进行记录
+
+*/5 * * * * cd /home/wwwroot/www.xxxx.com/scripts/ && ./guard >> /home/wwwroot/www.xxxx.com/scripts/guard.log 2>&1
+
+# 为了保险起见
+
+service cron restart
+```
+
+至此基本的守护操作就完成了，由于不是面向用户的，所以很多地方都以功能实现为主了。
+
+
+ 
+
+

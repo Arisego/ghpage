@@ -1,0 +1,194 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4中Sol2的接入
+author:
+ display_name: 风铃
+ login: flinkor
+ email: flinkor@foxmail.com
+ url: ''
+author_login: flinkor
+author_email: flinkor@foxmail.com
+wordpress_id: 2352
+wordpress_url: https://blog.ch-wind.com/?p=2352
+date: '2018-05-09 23:25:11 +0000'
+date_gmt: '2018-05-09 15:25:11 +0000'
+tags:
+- UE4
+- Sol2
+- lua
+---
+虽然说Lua的C++接入本身在网上能找到很多示例，但是在尝试对Sol2进行接入的时候还是遇到了一些问题，所以在此进行记录。
+
+
+当前使用的UE4版本为4.19.1。
+
+
+Sol2是进行Lua绑定的C++类库，过程中最主要的问题是，对Lua本身一知半解，所以没有很好的理解Sol2官方文档中所描述的一些术语。
+
+
+之所以会选择Sol2，是因为它号称自己是[[地上最快](http://sol2.readthedocs.io/en/latest/benchmarks.html)]的~
+
+
+## LuaJit
+
+
+似乎lua本身的脚本解释器有两个公开的版本，一个是LuaJit，一个是vanilla Lua。
+
+
+由于没有仔细的对这两者之间的差别进行区分，所以并不是特别清楚其中的具体区别。
+
+
+直接Google的话，Lua是指向vanilla lua的，而且LuaJit的Lua版本也比较靠前。
+
+
+但是由于Sol2的官方文档中说LuaJit的速度会比较快，所以就采用了LuaJit。
+
+
+那么首先第一步就是下载LuaJit，到了这一步就比较明了了。
+
+
+LuaJit有提供CMake的配置文件，用CMake配置一下之后就可以进行生成了。
+
+
+对于下一步的接入需要的是生成的Lua51.lib和Lua51.dll。
+
+
+## Sol2
+
+
+这个库本身也有提供CMake，直接使用CMake配置就好了。
+
+
+但是遇到的主要问题是，在和LuaJit的对接上，不过实际上在对整个库进行理清之后就不会有什么问题。
+
+
+Sol2有提供很多的Test所以在使用方面会有很多的便利。
+
+
+不过这里用CMake进行配置其实是不必要的，Sol2本身有提供单文件版本，其实只要include就可以了。
+
+
+但是LuaJit的话还是需要进行链接的，并且必须根据使用的Lua解释器的不同来提供不同的宏。基本这样包含就可以了：
+
+
+
+```
+extern "C"
+{
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
+#define SOL_USING_CXX_LUA        1
+#define SOL_USING_CXX_LUAJIT    1
+#include "sol.hpp"
+```
+
+最主要的是前面的Extern “C”不能忘记，不然会报很多的链接错误~
+
+
+## UE4插件接入
+
+
+据说以前Sol2接入的话会有一些问题，因为sol2本身对check有定义，所以会造成定冲突。
+
+
+于是sol2的作者后面给出了解决方案：
+
+
+
+```
+#if defined(UE_BUILD_DEBUG) || defined(UE_BUILD_DEVELOPMENT) || defined(UE_BUILD_TEST) || defined(UE_BUILD_SHIPPING) || defined(UE_SERVER)
+#define SOL_INSIDE_UNREAL
+#endif // Unreal Engine 4 bullshit
+
+#ifdef SOL_INSIDE_UNREAL
+#ifdef check
+#define SOL_INSIDE_UNREAL_REMOVED_CHECK
+#undef check
+#endif
+#endif // Unreal Engine 4 Bullshit
+```
+
+总之就是回避了一下：D
+
+
+不过说到UE4兼容，最近VA也新增了对UE4的特别支持。记得一开始的时候，VA经常在对UE4的函数进行跳转的时候崩掉VS，而且还有一定几率的崩掉VA建立的代码解析缓存，然后需要重新进行一次代码解析，非常的欢乐。
+
+
+不过新增的UE4支持还没有完全的测试过，不知实际上有什么改进还不是特别的清楚呢~
+
+
+## 测试
+
+
+最后在UE4中使用蓝图函数进行了简单的测试：
+
+
+
+```
+UE_LOG(LogTemp,Log, TEXT("=== basic ==="));
+
+// create an empty lua state
+sol::state lua;
+
+// by default, libraries are not opened
+// you can open libraries by using open_libraries
+// the libraries reside in the sol::lib enum class
+lua.open_libraries(sol::lib::base);
+// you can open all libraries by passing no arguments
+//lua.open_libraries();
+
+// call lua code directly
+lua.script("print('hello world')");
+
+// call lua code, and check to make sure it has loaded and run properly:
+auto handler = &sol::script_default_on_error;
+lua.script("print('hello again, world')", handler);
+
+// Use a custom error handler if you need it
+// This gets called when the result is bad
+auto simple_handler = [](lua_State*, sol::protected_function_result result) {
+// You can just pass it through to let the call-site handle it
+  return result;
+};
+// the above lambda is identical to sol::simple_on_error, but it's
+// shown here to show you can write whatever you like
+
+//
+{
+  auto result = lua.script("print('hello hello again, world') \n return 24", simple_handler);
+  if (result.valid()) {
+    UE_LOG(LogTemp, Log, TEXT("the third script worked, and a double-hello statement should appear above this one!"));
+    int value = result;
+    ensure(value == 24);
+  }
+  else {
+    UE_LOG(LogTemp, Log, TEXT("the third script failed, check the result type for more information!"));
+  }
+}
+
+/**    <This test will log out 0xE24C4A03 */
+{
+  auto result = lua.script("does.not.exist", simple_handler);
+  if (result.valid()) {
+    UE_LOG(LogTemp, Log, TEXT("the fourth script worked, which it wasn't supposed to! Panic!"));
+    int value = result;
+    ensure(value == 24);
+  }
+  else {
+    sol::error err = result;
+    UE_LOG(LogTemp, Log, TEXT("the fourth script failed, which was intentional! nError: %s"), ANSI_TO_TCHAR(err.what()));
+  }
+}
+```
+
+由于接下来还没有具体的使用计划，所以就在这里了。
+
+
+绑定好的Sol2插件可以到Github上下载：[[Sol2UE4](https://github.com/Arisego/Sol2UE4)]，这样有需要的童鞋就没有必要重新再绑一遍了~
+
+

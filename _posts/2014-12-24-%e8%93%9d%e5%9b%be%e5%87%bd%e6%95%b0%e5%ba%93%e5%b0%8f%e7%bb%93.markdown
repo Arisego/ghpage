@@ -1,0 +1,88 @@
+---
+layout: post
+status: publish
+published: true
+title: 蓝图函数库小结
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1098
+wordpress_url: http://blog.ch-wind.com/?p=1098
+date: '2014-12-24 22:15:16 +0000'
+date_gmt: '2014-12-24 14:15:16 +0000'
+tags:
+- UE4
+---
+蓝图函数库的功能非常强劲，如果在项目中使用的话有时能达到事半功倍的效果。
+
+
+蓝图函数库，Blueprint Function Library。可以非常方便的将代码中的函数暴露给所有的蓝图使用，同时也提供了很好的代码复用性。完成的蓝图函数库可以非常轻易的在其他项目中使用或者共享给其他人。由于在函数库中定义的所有函数都能在其他的蓝图中访问，可以说是和单例模式的C++代码接合的天然素材。也可以防止为了定义一些泛用的函数而频繁的使用接口继承。
+
+
+使用起来也是非常的简单明了。类似下面的代码就可以完成一个蓝图函数库了。
+
+
+
+```
+#pragma once
+
+#include "CoBpFuncLib.generated.h"
+
+/** Blueprintable并不是必须的 */
+UCLASS(Blueprintable) 
+class UCoBpFuncLib : public UBlueprintFunctionLibrary 
+{ 
+    GENERATED_UCLASS_BODY()
+
+public: 
+    /** <测试函数组 */ 
+    UFUNCTION(BlueprintCallable, Category = "UCoBpFuncLib") 
+        static int32 GetHp();
+
+    UFUNCTION(BlueprintCallable, Category = "UCoBpFuncLib") 
+        static void AddHp(int32 Val);
+};
+```
+
+上面的是头文件，如果没有打算在蓝图中继承这个函数库的话可以选择去掉这个声明。
+
+
+
+```
+#include "CoBpFuncLib.h" 
+#include "LogicMisc/StateCenter.h"
+
+////////////////////////////////////////////////////////////////////////// 
+// UCoBpFuncLib
+
+UCoBpFuncLib::UCoBpFuncLib(const class FObjectInitializer& PCIP) 
+    : Super(PCIP) 
+{
+
+}
+
+int32 UCoBpFuncLib::GetHp() 
+{ 
+    return StateCenter::sharedStateCenter()->miPlayerHp; 
+}
+
+void UCoBpFuncLib::AddHp(int32 Val) 
+{ 
+    StateCenter::sharedStateCenter()->miPlayerHp += Val; 
+}
+```
+
+上面的代码实现通过访问存储有miPlayerHp的单例来进行HP的访问和调整。编译后运行，随便打开一个蓝图都能访问到这两个函数。注意，上面代码中并没有给出StateCenter的定义，如果有想要直接尝试的童鞋请去掉相关的代码。
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2014/12/image_thumb2.png "image")](https://blog.ch-wind.com/wp-content/uploads/2014/12/image2.png)
+
+
+有了蓝图函数库，我们在进行游戏逻辑设计时就又多了很多选择。
+
+

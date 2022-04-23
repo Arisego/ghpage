@@ -1,0 +1,40 @@
+---
+layout: post
+status: publish
+published: true
+title: 再次进入维护模式
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 462
+wordpress_url: http://blog.ch-wind.com/?p=462
+date: '2012-07-19 03:29:01 +0000'
+date_gmt: '2012-07-18 19:29:01 +0000'
+tags: []
+---
+每次心情上有变化的时候大概都会调整一下这边。
+
+
+于是这一次也是一样，站点再次进入维护模式，虽然这边基本没有人来看，但是到底还是对外的，所以在此声明一下。
+
+
+最近，不对，其实一直心理状态都不是很稳定。今后也不知道能不能变成稳定的状态呢？
+
+
+打算以后要写一些稍微有用的内容。把这里改造成稍微对世界有点用的地方，而不是一个堆砌个人感情的地方。但是还是会坚持不删除内容的原则呢，虽然以前写的东西有的自己都看不下去，但那也是自己的思念的一部分呢。
+
+
+说起来www域名自从被ban掉之后到现在都没有恢复，明明我什么都没有做呀。
+
+
+这次虽然也想一次性搞定，无奈没有以前那样的激情了呢，对站点的调整也没有什么感觉的样子。
+
+
+这次就慢慢的来吧。
+
+

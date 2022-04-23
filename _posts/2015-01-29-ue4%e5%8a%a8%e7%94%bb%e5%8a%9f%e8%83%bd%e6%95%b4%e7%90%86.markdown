@@ -1,0 +1,159 @@
+---
+layout: post
+status: publish
+published: true
+title: UE4动画功能整理
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 1112
+wordpress_url: http://blog.ch-wind.com/?p=1112
+date: '2015-01-29 23:29:53 +0000'
+date_gmt: '2015-01-29 15:29:53 +0000'
+tags:
+- UE4
+- 动画
+---
+工欲善其事必先利其器，最近一段开始了对UE4动画功能的系统性整理和学习。好在现在UE4的文档中文化已经开始了，有的文档是中文的，读起来也轻松很多。
+
+
+当前使用的UE4版本为4.6.1。
+
+
+**AnimBlueprints**
+
+
+动画蓝图分为通常的事件图表和专有的动画蓝图两种，其中动画蓝图主要负责通过读取到的变量进行相应的动画播放。事件图表则是负责更新数值和状态变量。
+
+
+**Animation Composite**
+
+
+动画合成的作用是将多个动画进行组合变成新的合成动画，对于经常性的会进行序列播放的动画将其整合成一个进行管理和使用比较方便。
+
+
+**Skeletal Controls**
+
+
+骨骼控制可以实现在动画播放的过程中精确到单个骨骼的播放控制，这样可以使得代码对动画的播放拥有更多的灵活性。操作相对简单，可以在使用到时参考[文档](https://docs.unrealengine.com/latest/CHN/Engine/Animation/NodeReference/SkeletalControls/index.html)。
+
+
+**Physics-Based Animation**
+
+
+基于物理的动画，可以对骨架中的部分骨骼开启物理模拟。不过要正常的打开物理模拟需要为物体指定物理资源。
+
+
+**IK**
+
+
+IK的作用相信玩过相关游戏的童鞋都比较清楚，简单的来说就是用脚来控制大腿的感觉。通过脚、手的位置来逆向的沿着骨架调整动画。其作用是让动画变得更加真实，和骨骼控制相配合即可。需要用到时参照[官方的示例](https://docs.unrealengine.com/latest/CHN/Engine/Animation/IKSetups/index.html)即可。
+
+
+**Animation Retargeting**
+
+
+就是将动画共享给其他模型，减少动画制作的成本。主要分为两种形式，一种是在骨骼相同的模型之间使用相同的动画。另一种是通过Rig这个中间件使得骨骼结构不同的模型得以使用共享的动画。Rig的原理类似于对骨骼进行映射，相对的同骨骼架构本身就是可以共享动画的。这个部分相对简单，需要实际应用时参照[官方文档](https://docs.unrealengine.com/latest/INT/Engine/Animation/AnimHowTo/Retargeting/index.html)操作即可。
+
+
+**Animation Notifications**
+
+
+动画通知可以使得我们在动画播放的某个阶段进行声音的播放、粒子系统的演出或者触发事件接口。
+
+
+![PlayParticleEffectNotify.png](http://docs.unrealengine.com/latest/images/Engine/Animation/Sequences/Notifies/PlayParticleEffectNotify.jpg)
+
+
+**Animation Curves**
+
+
+通过曲线来对变形动画动画的数值进行更改和控制。
+
+
+**AnimMontage**
+
+
+Montage的主要功能是动画的管理和组织，通过将放置于slot中的一个或多个动画在sections中重组，可以让代码更好的对动画播放进行控制。同时Montage还提供了section播放时的分支点功能，分支点的功能和动画通知事件类似，区别之处在于分支点是同步的。因此分支点在时间上将会更加精确，同时也更加消耗系统资源。AnimMontage的一个重要作用之一，就是通过Slot的形式给予了代码层对AnimGraph的动画播放的控制权限。
+
+
+**Root Motion**
+
+
+根骨骼的功能是为会产生移动的动画提供锁定。例如美术资源的动画是包含位移的情况，直接应用这个动画就会导致角色的碰撞检测实体和显示的物体之间的分离。官方的演示图片很直观的展示了这个问题：
+
+
+![](http://docs.unrealengine.com/latest/images/Engine/Animation/RootMotion/HammerSlam_NoRootMotion_Wall.gif)
+
+
+ 
+
+
+**Blend Space**
+
+
+动画混合可以将两个或多个动画混合起来，通过调整暴露出来的值来调节混合的程度。例如当速度小于100时播放行走动画，当速度大于300时播放奔跑动画。而在100~300之间则播放行走和奔跑动画的混合。而如果进一步的混合向左、向右和向后的行走和奔跑动画的话，就可以轻松的实现八方向行走动画了
+
+
+[![image](https://blog.ch-wind.com/wp-content/uploads/2015/01/image_thumb.png "image")](https://blog.ch-wind.com/wp-content/uploads/2015/01/image.png)
+
+
+**Additive Animations**
+
+
+UE4可以在动画混合时将动画单独指定给某个骨骼以及其所有的子节点。这样以来就可以实现只给上半身播放特定的动画，而人物可以进行行走、下蹲或者站立不受其影响。其核心的部分是Layered blend per bone结点：
+
+
+![Animations16.png](http://docs.unrealengine.com/latest/images/Engine/Animation/AnimHowTo/AdditiveAnimations/Animations16.jpg)
+
+
+在其属性LayerSetup中进行指定：
+
+
+![Animations18.png](http://docs.unrealengine.com/latest/images/Engine/Animation/AnimHowTo/AdditiveAnimations/Animations18.jpg)
+
+
+就可以实现只将射击动画传递到上半身。详细的实现可参照[文档](https://docs.unrealengine.com/latest/INT/Engine/Animation/AnimHowTo/AdditiveAnimations/index.html)。
+
+
+**Aim Offset**
+
+
+Aim Offset是用来实现多方向瞄准的动画混合。和其他的动画混合一样，需要提供面向各个方向瞄准的动画作为blend的基础。官方的示例中演示了如何从动画中通过删除帧数来生成这些动画的过程。
+
+
+![AimOffset22.png](http://docs.unrealengine.com/latest/images/Engine/Animation/AnimHowTo/AimOffset/AimOffset22.jpg)
+
+
+得到上面那些动画之后，给每一个动画指定Additive Settings为正射的动画即可新建Aim Offset了。
+
+
+![AimOffset30.png](http://docs.unrealengine.com/latest/images/Engine/Animation/AnimHowTo/AimOffset/AimOffset30.jpg)
+
+
+操作模式是blend通用的。
+
+
+**Socket**
+
+
+通过在骨骼上附加Socket，可以使得额外的物体可以附加在骨骼上。
+
+
+![AttachActorToActor.png](http://docs.unrealengine.com/latest/images/Engine/Content/Types/SkeletalMeshes/Sockets/AttachActorToActor.jpg)![AttachActorToComponent.png](http://docs.unrealengine.com/latest/images/Engine/Content/Types/SkeletalMeshes/Sockets/AttachActorToComponent.jpg)![AttachTo.png](http://docs.unrealengine.com/latest/images/Engine/Content/Types/SkeletalMeshes/Sockets/AttachTo.jpg)
+
+
+可以在游戏逻辑中通过蓝图进行附加操作，也可以直接在编辑其中进行附加以检测或改变模型的外观。
+
+
+---------------------
+
+
+总体而言，UE4提供的动画工具都是比较直观明了的。主要的概念也就上面总结的这些，有需要具体使用时再详细的参照文档进行实现。操作过两三遍之后应该就能熟练掌握了。
+
+

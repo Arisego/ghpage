@@ -1,0 +1,56 @@
+---
+layout: post
+status: publish
+published: true
+title: 穿透幻影的太阳官网资源爬取
+author:
+ display_name: chaoshikari
+ login: chaoshikari
+ email: chaoshikari@gmail.com
+ url: http://blog.ch-wind.com
+author_login: chaoshikari
+author_email: chaoshikari@gmail.com
+author_url: http://blog.ch-wind.com
+wordpress_id: 661
+wordpress_url: http://blog.ch-wind.com/?p=661
+date: '2013-08-31 23:32:10 +0000'
+date_gmt: '2013-08-31 15:32:10 +0000'
+tags:
+- 穿透幻影的太阳
+---
+今天本来打算到各个新番的官网看看顺便找点素材的，没想到最后却演变成了资源爬取。
+
+
+新番里穿透幻影的太阳还是挺不错的，画风和剧情还有人设都比较喜欢。这个姑且不谈，在动画官网看到有一个名为天道三姐妹占卜屋的flash小应用，点进去看了下，于是一切的悲剧开始了。
+
+
+[![loading](https://blog.ch-wind.com/wp-content/uploads/2013/08/loading.gif)](https://blog.ch-wind.com/wp-content/uploads/2013/08/loading.gif)
+
+
+一直感觉这动画的萌化塔罗牌画得很不错，可是官网上只能找到一个很缩小的版本和一个大的斜着摆放的版本。一开始还没看到那个斜着的版本，在用IDM抓取之后才发现网站上有这样的资源。玩占卜的时候发现在占卜屋里面的塔罗牌是大版的也是直的，于是把swf文件顺道拖了下来。可是没想到swf下过来之后居然没有办法运行，居然是和网站协同工作的。
+
+
+于是尝试换个资源嗅探的思路，用websniffer监视文件的下载。本来以为会一番风顺，没想到这个占卜居然会检测cookie，每次的结果都是一样的。虽然想要清除cookie，但是浏览器上还有各种忘记密码网站的cookie，这一清可伤不起。
+
+
+看着手上的loading.swf和game.swf，实在没有办法，只好对swf进行反汇编。这事是最花时间的，虽然我知道这玩意能反汇编。但是我手头却没有对应的工具。不得不说，现在的网络环境确实不如从前了。由于SEO技术的大规模流行，大家都知道要去优化各种关键词。换了几个关键词找到的都是些不入流的工具，而且还都要价不菲。最后终于找到国人写的软件，硕思闪客精灵，也是个收费软件。破解站貌似还被作者告版权删掉了。还好有万恶的迅雷在，一度流入迅雷网络的资源就很难被删干净了，试了下离线，果断秒传了~
+
+
+经过千辛万苦，终于是找到了牌的真实路径。顺便把整个flash要用到的资源统统拉了下来，打成包来用。要不然浪费那么多时间实在是对不起自己。只能说是途中燃起了对抗意识，一发不可收，足足费了我两个多小时。最悲剧的是网站服务器那边貌似有防抓取的侦测，到最后各种资源不给放速度……爬站这种事以前长干，好久不做都生疏了。不过到现在我都没搞懂我为什么要花时间来干这事……………………
+
+
+[![愚者](https://blog.ch-wind.com/wp-content/uploads/2013/08/0-161x300.png)](https://blog.ch-wind.com/wp-content/uploads/2013/08/0.png)
+
+
+
+> 于是把打包的flash放出来，使用的时候只要解包打开就可以了。每一次占卜之后再六小时内结果都不会变，除非在C盘找到名为tarot.sol的cookie文件删除掉才行。顺便最开始的目的，塔罗牌另外打了下，方便像我一样的懒人。
+> 
+> 
+> 占卜： http://pan.baidu.com/share/link?shareid=869027792&uk=1913549955
+> 
+> 
+> 塔罗牌： http://pan.baidu.com/share/link?shareid=866304601&uk=1913549955
+> 
+> 
+
+
