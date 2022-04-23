@@ -3,11 +3,15 @@ layout: default
 paginate: true
 ---
 {% for post in paginator.posts %}
-<h2><a class="nav-link" href="{{ post.url }}">{{ post.title }}</a></h2>
-<div class="mb-1 text-muted">{{ post.date| date_to_string }}</div>
 
-<div class="content">
-    {{ post.excerpt }}
+
+<div class="card">
+  <div class="card-body">
+    <h2 class="card-title">{{ post.title }}</h2>
+    <div class="card-subtitle mb-2 text-muted">{{ post.date| date_to_string }}</div>
+    <p class="card-text">{{ post.excerpt }}</p>
+    <button href="{{ post.url }}" class="btn btn-secondary">继续阅读</button>
+  </div>
 </div>
 {% endfor %}
 
