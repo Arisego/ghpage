@@ -29,7 +29,7 @@ tags: []
 原视频： [GET GAME IDEAS - The Ultimate Guide!](https://www.youtube.com/watch?v=y2IAjXl5xRU)
 
 
-另有一个关于设计的视频：[Get Good Design Ideas! || But... Design Method!](https://www.youtube.com/watch?v=x46VdUtvDDs)，介绍的思路具有相似性
+另有一个关于设计的视频：[Get Good Design Ideas! But... Design Method!](https://www.youtube.com/watch?v=x46VdUtvDDs)，介绍的思路具有相似性
 
 
 对于任何游戏创意，需要从以下四点去考虑是否合适：

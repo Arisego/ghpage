@@ -143,7 +143,7 @@ ShadowColor基于BaseColor进行计算：
 
 
 
-```
+```C++
 HalfNoL = dot(Normal, Light) * 0.5 + 0.5;
 ToonNoL = step(Threshold, HalfNoL);
 ```
