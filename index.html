@@ -8,7 +8,13 @@ paginate: true
   <div class="col-10">
     <div class="border-bottom mb-3">
       <h2 class="card-title">{{ post.title }}</h2>
-      <div class="card-subtitle mb-2 text-muted">{{ post.date| date_to_string }}</div>
+      <div class="card-subtitle mb-2 text-muted">
+        {{ post.date| date_to_string }}
+        {% for tag in post.tags %}
+        <span class="badge bg-light text-dark">{{ tag }}</span>
+        {% endfor %}
+      </div>
+
       <p class="card-text">{{ post.excerpt }}</p>
       <a href="{{ post.url }}" class="link-secondary mb-1">继续阅读</a>
     </div>
@@ -36,7 +42,7 @@ paginate: true
 
     {% if paginator.next_page %}
     <li class="page-item">
-      <a href="{{ paginator.next_page_path }}"  class="page-link" href="#">Next</a>
+      <a href="{{ paginator.next_page_path }}" class="page-link" href="#">Next</a>
     </li>
     {% else %}
     <li class="page-item disabled">
@@ -45,5 +51,3 @@ paginate: true
     {% endif %}
   </ul>
 </nav>
-
-
