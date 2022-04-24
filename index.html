@@ -5,14 +5,15 @@ paginate: true
 {% for post in paginator.posts %}
 
 
-<div class="card">
+<div class="card mt-1">
   <div class="card-body">
     <h2 class="card-title">{{ post.title }}</h2>
     <div class="card-subtitle mb-2 text-muted">{{ post.date| date_to_string }}</div>
     <p class="card-text">{{ post.excerpt }}</p>
-    <button href="{{ post.url }}" class="btn btn-secondary">继续阅读</button>
+    <a href="{{ post.url }}" class="link-secondary">继续阅读</a>
   </div>
 </div>
+
 {% endfor %}
 
 <!-- Pagination links -->

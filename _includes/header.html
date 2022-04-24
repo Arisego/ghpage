@@ -18,11 +18,16 @@
         {%- for path in page_paths -%}
             {%- assign my_page = site.pages | where: "path", path | first -%}
             {% unless my_page.exclude %}
-            {%- if my_page.title -%}
-                <li class="nav-item"><a href="{{ my_page.url | relative_url }}" class="nav-link">{{ my_page.title | escape }}</a></li>
-            {%- endif -%}
+                {%- if my_page.title -%}
+                    {% assign act_class = nil %}
+                    {% if page.url contains my_page.url %}
+                        {% assign act_class = 'active' %}
+                    {% endif %}
+                    <li class="nav-item"><a href="{{ my_page.url | relative_url }}" class="nav-link {{ act_class }}">{{ my_page.title | escape }}</a></li>
+                {%- endif -%}
             {% endunless %}
         {%- endfor -%}
+
         </ul>
     {%- endif -%}
   </header>
