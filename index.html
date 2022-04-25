@@ -15,8 +15,10 @@ paginate: true
         {% endfor %}
       </div>
 
-      <p class="card-text">{{ post.excerpt }}</p>
-      <a href="{{ post.url }}" class="link-secondary mb-1">继续阅读</a>
+      <div class="mb-1 pb-1">
+        <p class="card-text">{{ post.excerpt }}</p>
+        <a class="btn btn-outline-primary" href="{{ post.url }}" role="button">继续阅读</a>
+      </div>
     </div>
   </div>
 </div>
