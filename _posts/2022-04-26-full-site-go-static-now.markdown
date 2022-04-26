@@ -1,8 +1,10 @@
 ---
 layout: post
 title:  "全站静态化迁移完成"
+status: publish
+published: true
+tags: []
 ---
-
 最近几天把博客从wordpress迁移到了静态的Jekyll，然后部署到了Github.io上。
 
 
