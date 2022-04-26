@@ -57,3 +57,4 @@ paginate: 5
 paginate_path: "/blog/page:num/"
 permalink: /:title/
 google_analytics: UA-26559179-1
+url: https://blog.ch-wind.com
