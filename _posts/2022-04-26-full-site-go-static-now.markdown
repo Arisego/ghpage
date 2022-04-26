@@ -4,8 +4,9 @@ title:  "全站静态化迁移完成"
 status: publish
 published: true
 tags: []
+excerpt: "最近几天把博客从wordpress迁移到了静态的Jekyll，然后部署到了Github.io上。"
 ---
-<p>最近几天把博客从wordpress迁移到了静态的Jekyll，然后部署到了Github.io上。</p>
+最近几天把博客从wordpress迁移到了静态的Jekyll，然后部署到了Github.io上。
 
 
 其实本身博客这边已经很久没有更新了，最主要的原因是没有足够的时间。
