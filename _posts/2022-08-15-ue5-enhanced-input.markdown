@@ -43,6 +43,32 @@ tags:
 
 表现上会变成只能左右移动无法上下移动，由于原文只有这里没有截图，当时跳过去了。
 
+### Modifier自定义
+
+修改器虽然可以自定义，但是其实默认的基本够用了。不过需要的时候可以尝试下，很简单的。直接参考引擎的内部实现，继承下`UInputModifier`就好了。
+
+需要注意的是InputAction的类型是无法修改的，看引擎的这里：
+
+```C++
+FInputActionValue UEnhancedPlayerInput::ApplyModifiers(const TArray<UInputModifier*>& Modifiers, FInputActionValue RawValue, float DeltaTime) const
+{
+	TRACE_CPUPROFILER_EVENT_SCOPE(EnhPIS_Modifiers);
+
+	FInputActionValue ModifiedValue = RawValue;
+	for (UInputModifier* Modifier : Modifiers)
+	{
+		if (Modifier)
+		{
+			// Enforce that type is kept to RawValue type between modifiers.
+			ModifiedValue = FInputActionValue(RawValue.GetValueType(), Modifier->ModifyRaw(this, ModifiedValue, DeltaTime).Get<FInputActionValue::Axis3D>());
+		}
+	}
+	return ModifiedValue;
+}
+```
+
+就算在修改器里面改了，在这里也会被设置回到`RawValue.GetValueType()`。
+
 ## CommonUI问题
 
 CommonUI这边有一个全局的Action绑定，但是配置好之后使用的过程中总是会报错。
